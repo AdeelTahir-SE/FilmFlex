@@ -1,9 +1,9 @@
 import Image from "next/image";
-import MovieSlider from "./components/moviesslider";
-import WeeklyMovies from "./components/weeklymovies";
-import img1 from "@/app/components/image.jpeg"
-import img2 from "@/app/components/image2.jpeg"
-import Seats from "./components/seats";
+import MovieSlider from "./component/moviesslider";
+import WeeklyMovies from "@/app/component/WeeklyMovies"
+import img1 from "@/app/component/image.jpeg"
+import img2 from "@/app/component/image2.jpeg"
+import Seats from "@/app/component/Seats";
 export default function Home() {
   const movies = [
     {

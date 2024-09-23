@@ -1,8 +1,18 @@
 import Link from "next/link";
-
+import Image from "next/image";
+import filmflex from "@/public/filmflextext.png";
 export default function Navbar() {
   return (
-    <nav className="bg-black sticky z-10 top-0 w-full">
+    <nav className="bg-black sticky z-10 top-0 w-full flex flex-row justify-between">
+      <div className="flex flex-row justify-between md:justify-end gap-10 p-4 items-center text-white font-bold text-base">
+        <Link href="/">
+          <Image
+            src={filmflex}
+            className="w-16 h-16 object-cover"
+            alt="FilmFlex"
+          />
+        </Link>
+      </div>
       <ul className="flex flex-row justify-between md:justify-end gap-10 p-4 items-center text-white font-bold text-base">
         <Link href="/">
           <li className="cursor-pointer ">FilmFlex</li>
