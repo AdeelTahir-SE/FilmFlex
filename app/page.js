@@ -1,12 +1,22 @@
+"use client"
 import Image from "next/image";
 import img1 from "@/app/component/image.jpeg";
 import img2 from "@/app/component/image2.jpeg";
 import { FaStar } from "react-icons/fa";
 import WhyJoin from "./component/WhyJoin";
+import Link from "next/link";
+import useInViewAnimation from "@/app/component/useInView";
 
 function Customers({ comment, name, avatar, rating, date }) {
+  const [ref, hasBeenInView] = useInViewAnimation({ triggerOnce: true });
+
   return (
-    <div className="bg-gradient-to-br from-gray-800 via-gray-700 to-black p-6 rounded-lg shadow-lg transform transition-transform hover:scale-105 animate-fadeIn">
+    <div
+      ref={ref}
+      className={`bg-gradient-to-br from-gray-800 via-gray-950 to-black p-6 hover:scale-125 rounded-lg hover:cursor-pointer shadow-lg transform transition-transform ${
+        hasBeenInView ? 'scale-95 opacity-100' : 'scale-75 opacity-0'
+      }`}
+    >
       <div className="flex items-center mb-4">
         <img
           src={avatar}
@@ -42,12 +52,14 @@ export default function Home() {
     { src: img1, title: "Trending Movie 5", description: "An action-packed superhero movie." },
   ];
 
+  const [ref, hasBeenInView] = useInViewAnimation({ triggerOnce: true });
+
   return (
     <div className="flex flex-col bg-black min-h-screen">
       {/* Hero Section */}
       <header
         className="relative bg-cover bg-center h-screen"
-        style={{ backgroundImage: `url(https://www.shutterstock.com/image-vector/cinema-hall-white-blank-screen-600nw-2469487367.jpg)` }}
+        style={{ backgroundImage: 'url(https://www.shutterstock.com/image-vector/cinema-hall-white-blank-screen-600nw-2469487367.jpg)' }}
       >
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white">
@@ -55,21 +67,22 @@ export default function Home() {
           <p className="text-2xl mb-8">
             Book your movie tickets easily and quickly
           </p>
-          <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+          <Link href="/movies"><span className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
             Book Now
-          </button>
+          </span>
+          </Link>
         </div>
       </header>
 
       {/* Trending Movies Section */}
       <main className="flex flex-col items-center justify-center px-4 py-8">
-        <section className="w-full max-w-6xl mt-8">
-          <h2 className="text-white font-bold text-2xl mb-4">Trending Movies</h2>
+        <section ref={ref} className={`w-full max-w-6xl mt-8 text-center transition-opacity duration-1000 ${hasBeenInView ? 'opacity-100' : 'opacity-0'}`}>
+          <h2 className="text-white font-bold text-4xl mb-4">Trending Movies</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {trendingMovies.map((movie, index) => (
               <div
                 key={index}
-                className="bg-gray-800 p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105 hover:bg-gray-700"
+                className="bg-gray-800  p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105 hover:bg-gray-700"
               >
                 <div className="relative">
                   <Image
@@ -77,15 +90,26 @@ export default function Home() {
                     alt={movie.title}
                     className="rounded-lg mb-4"
                   />
+                  <div
+                    className="absolute bottom-1 left-0 text-9xl font-bold p-2"
+                    style={{
+                      color: 'black',
+                      textShadow: '1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff',
+                    }}
+                  >
+                    {index + 1}
+                  </div>
                   <div className="absolute inset-0 bg-black opacity-25 rounded-lg"></div>
                 </div>
                 <h3 className="text-xl font-bold text-red-500 mb-2">
                   {movie.title}
                 </h3>
                 <p className="text-gray-300 mb-4">{movie.description}</p>
-                <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                  Watch Now
-                </button>
+                <Link href={`/movies/${movie.title}`}>
+                  <span className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    Watch Now
+                  </span>
+                </Link>
               </div>
             ))}
           </div>
@@ -93,8 +117,8 @@ export default function Home() {
 
         <WhyJoin />
 
-        <section className="w-full max-w-6xl mt-12">
-          <h2 className="text-white font-bold text-2xl mb-4">
+        <section className="w-full max-w-6xl mt-12 text-center">
+          <h2 className="text-white font-bold text-4xl mb-4">
             What Our Users Say
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -106,16 +130,16 @@ export default function Home() {
               date="2024-09-24T12:34:56Z"
             />
             <Customers
-              comment="This is an amazing service!"
+              comment="This is an amazing service! lorem12"
               name="John Doe"
-              avatar="https://example.com/avatar.jpg"
+              avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4oLLQanJaw4t11-7KzAAFJG4sbQj53qGemg&s"
               rating={4}
               date="2024-09-24T12:34:56Z"
             />
             <Customers
               comment="This is an amazing service!"
               name="John Doe"
-              avatar="https://example.com/avatar.jpg"
+              avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4oLLQanJaw4t11-7KzAAFJG4sbQj53qGemg&s"
               rating={4}
               date="2024-09-24T12:34:56Z"
             />

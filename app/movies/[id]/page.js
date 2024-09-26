@@ -66,15 +66,8 @@ export default function Page() {
       <div>
         <h2 className="text-2xl font-bold text-red-500 text-center mb-4">Seats Available!</h2>
         <div className="flex flex-row items-center justify-center gap-14 ">
-  <div className="flex justify-center items-center">
-    <Seats noofseats={60} cols={4} />
-  </div>
-  <div className="flex justify-center items-center">
-    <Seats noofseats={120} cols={8} />
-  </div>
-  <div className="flex justify-center items-center">
-    <Seats noofseats={60} cols={4} />
-  </div>
+    <Seats noofseats={60} reservedseats={[1,2,3]} premiumseats={[12,1,3,4,6,7,7,8,7,6,,5,4,3,3,,45,5,5,67,83,96,98,46,73,56]} containers={[40,80,40]} cols={[4,8,4]} />
+ 
 </div>
       </div>
     </div>

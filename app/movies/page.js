@@ -103,7 +103,7 @@ export default function page() {
         <MovieSlider movies={movies} />
       </div>
       <div className="flex flex-col items-center justify-center mt-8">
-        <h2 className="text-white font-bold text-2xl">Weekly Movies</h2>
+        <h2 className="text-white font-bold text-2xl">Top Week day movies</h2>
         <div className="flex flex-col items-start justify-center space-y-4 mt-4">
         {<WeeklyMovies movies={weeklyMovies}/>}
         </div>
