@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import Footer from "./component/Footer";
+import Head from "next/head";
 import Navbar from "./component/navbar";
 import Sessionwrapper from "./component/Sessionwrapper";
 const geistSans = localFont({
@@ -23,6 +24,14 @@ export default function RootLayout({ children }) {
   return (
     <Sessionwrapper>
     <html lang="en">
+      <Head>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Creepster&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased `}
       >

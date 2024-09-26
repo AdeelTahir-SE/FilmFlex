@@ -8,7 +8,22 @@ module.exports = {
   ],
   theme: {
   	extend: {
+		fontFamily: {
+			creepster: ['Creepster', 'cursive'], // Add your custom font here
+		  },
+		boxShadow: {
+			'glow': '0 0 10px rgba(255, 0, 0, 0.8), 0 0 20px rgba(255, 0, 0, 0.6)',
+		  },
+
   		keyframes: {
+			fadeIn :{
+			'0%': {
+				opacity: '0'
+			},
+			'100%': {
+				opacity: '1'
+			}
+		},
   			scroll: {
   				'0%': {
   					transform: 'translateX(0)'
@@ -17,6 +32,11 @@ module.exports = {
   					transform: 'translateX(-100%)'
   				}
   			},
+			 
+			
+			
+			
+			
   			flicker: {
   				'0%': {
   					opacity: '0'
@@ -61,12 +81,22 @@ module.exports = {
   		animation: {
   			animatescroll: 'scroll 15s linear infinite',
   			flicker: 'flicker 1.5s ease-in-out infinite alternate',
-  			glow: 'glow 1.5s ease-in-out 1'
+  			glow: 'glow 1.5s ease-in-out 1',
+			  fadeIn: 'fadeIn 1s ease-in-out',
+
   		},
+		
   		animationPlayState: {
   			paused: 'paused',
   			running: 'running'
   		},
+		  backdropBlur: {
+			sm: '4px',
+			DEFAULT: '10px',
+			md: '16px',
+			lg: '24px',
+			xl: '40px',
+		  },
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -115,6 +145,11 @@ module.exports = {
   			sm: 'calc(var(--radius) - 4px)'
   		}
   	}
+  },
+  variants: {
+    extend: {
+      backdropBlur: ['hover', 'focus'],
+    },
   },
   plugins: [
     function ({ addUtilities }) {

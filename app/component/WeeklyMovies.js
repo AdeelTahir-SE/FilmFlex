@@ -10,25 +10,37 @@ export default function WeeklyMovies({ movies }) {
   }, [movies]);
 
   return (
-    <div className="py-4 flex flex-row ">
+    <div className="py-8 px-4 flex  justify-center ">
       {movieList.map((movie, index) => (
-        <div key={index} className="flex flex-col  items-center mb-4 bg-gray-900 m-1">
-          <Image 
-            src={movie.src} 
-            alt={movie.title || `Movie ${index + 1}`} 
-            width={100} 
-            height={150} 
-            className="rounded-lg w-full"
+        <div
+          key={index}
+          className="flex flex-col items-center bg-gray-950 cursor-pointer p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105 hover:shadow-2xl"
+        >
+   
+   <div
+    className="absolute bottom-44 left-0  text-7xl font-bold p-2 "
+    style={{
+        color: 'black',
+        textShadow: '1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff',
+    }}
+>
+    {index + 1}
+</div>
+
+          <Image
+            src={movie.src}
+            alt={movie.title || `Movie ${index + 1}`}
+            width={200}
+            height={300}
+            className="rounded-lg mb-4"
           />
-          <div className="ml-4">
-            <h3 className="text-xl font-bold drop-shadow-2xl text-white">{movie.title}</h3>
-            <p className="text-gray-400">{movie.timing}</p>
-            <p className="text-gray-400">See details of the day</p>
+          <div className="text-center">
+            <h3 className="text-2xl font-bold text-white mb-2">{movie.title}</h3>
+            <p className="text-gray-400 mb-2">{movie.timing}</p>
+            <p className="text-red-500 cursor-pointer hover:underline">See details of the day</p>
           </div>
         </div>
       ))}
     </div>
   );
 }
-
-

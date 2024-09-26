@@ -1,56 +1,124 @@
 import Image from "next/image";
-import MovieTrailer from "../component/MovieTrailer"; // Fixed import name
-import image from "@/app/component/image.jpeg";
-import Seats from "../component/Seats";
-
-const comments = [
-  { name: "Alice", comment: "Great movie!", time: "2 hours ago" },
-  { name: "Bob", comment: "Loved the trailer!", time: "1 hour ago" },
-];
-
+import MovieSlider from "@/app/component/moviesslider";
+import WeeklyMovies from "@/app/component/WeeklyMovies"
+import img1 from "@/app/component/image.jpeg"
+import img2 from "@/app/component/image2.jpeg"
+import Seats from "@/app/component/Seats";
 export default function page() {
-  const dummyData = {
-    title: "Sample Movie Title",
-    description: "This is a sample description for the movie. It provides an overview of the plot and main themes.",
-  };
+  const movies = [
+    {
+      src: img1,
+      title: "Movie 1",
+    },
+    {
+      src: img2,
+      title: "Movie 2",
+    },
+    {
+      src: img1,
+      title: "Movie 3",
+    },
+    {
+      src: img2,
+      title: "Movie 4",
+    },
+    {
+      src: img1,
+      title: "Movie 5",
+    },
+    {
+      src: img2,
+      title: "Movie 6",
+    },
+    {
+      src: img1,
+      title: "Movie 7",
+    },
+    {
+      src: img2,
+      title: "Movie 8",
+    },
+    {
+      src: img1,
+      title: "Movie 9",
+    },
+    {
+      src: img2,
+      title: "Movie 10",
+    },
+  ];
+
+  const weeklyMovies = [
+    {
+      title: "Weekly Movie 1",
+      timing: "Monday 7:00 PM",
+      details: "An exciting adventure movie.",
+      src: img1,
+    },
+    {
+      title: "Weekly Movie 2",
+      timing: "Tuesday 8:00 PM",
+      details: "A thrilling mystery movie.",
+      src: img2,
+    },
+    {
+      title: "Weekly Movie 3",
+      timing: "Wednesday 6:00 PM",
+      details: "A heartwarming drama movie.",
+      src: img1,
+    },
+    {
+      title: "Weekly Movie 2",
+      timing: "Tuesday 8:00 PM",
+      details: "A thrilling mystery movie.",
+      src: img2,
+    },
+    {
+      title: "Weekly Movie 3",
+      timing: "Wednesday 6:00 PM",
+      details: "A heartwarming drama movie.",
+      src: img1,
+    },
+    {
+      title: "Weekly Movie 4",
+      timing: "Thursday 9:00 PM",
+      details: "A hilarious comedy movie.",
+      src: img2,
+    },
+    {
+      title: "Weekly Movie 5",
+      timing: "Friday 7:30 PM",
+      details: "An action-packed superhero movie.",
+      src: img1,
+    },
+  ];
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">{dummyData.title}</h1>
-      <div className="mb-6">
-        <MovieTrailer
-          trailerlink="https://www.youtube.com/embed/pyKONWsQ1ek?si=Liz_WQBdBV0kkvAj"
-          thumbnail={image}
-        />
+    <div className="flex flex-col bg-black h-full">
+      <h1 className="text-4xl font-bold text-red-600 text-center py-4 px-6 rounded-lg shadow-lg animate-glow">
+        Secure Your Movie Seat Today!
+      </h1>
+      <div className="flex flex-col items-center justify-center">
+        <h2 className="text-white font-bold text-2xl">Latests</h2>
+        <MovieSlider movies={movies} />
       </div>
-      <div className="mb-6">
-        <Image 
-          src={image} 
-          alt="Movie Poster" 
-          width={300} // Specify width
-          height={450} // Specify height
-          className="rounded-lg"
-        />
-        <p className="mt-4 text-gray-700">{dummyData.description}</p>
+      <div className="flex flex-col items-center justify-center mt-8">
+        <h2 className="text-white font-bold text-2xl">Weekly Movies</h2>
+        <div className="flex flex-col items-start justify-center space-y-4 mt-4">
+        {<WeeklyMovies movies={weeklyMovies}/>}
+        </div>
       </div>
-      <div className="mb-6">
-        <h2 className="text-xl font-bold">Comments</h2>
-        {comments.length > 0 ? (
-          comments.map((element, i) => (
-            <div key={i} className="mb-4 p-4 border rounded shadow">
-              <h3 className="font-semibold">{element.name}</h3>
-              <p>{element.comment}</p>
-              <p className="text-gray-500">{element.time}</p>
-            </div>
-          ))
-        ) : (
-          <p>No comments available.</p>
-        )}
-      </div>
-      <div>
-        <h2 className="text-xl font-bold">Seats Available!</h2>
-        <Seats cols={4} noofseats={60} />
-      </div>
+ 
+
+
     </div>
   );
 }
+
+
+
+
+
+
+    
+  
