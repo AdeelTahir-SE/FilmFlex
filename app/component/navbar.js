@@ -20,6 +20,9 @@ export default function Navbar() {
         <Link href="/movies">
           <li className="cursor-pointer text-red-700">Reserve Now!</li>
         </Link>
+        <Link href="/offerspromotions">
+          <li className="cursor-pointer text-red-700">Offers!</li>
+        </Link>
         <Link href="/notifications">
           <li className="cursor-pointer filter invert flex justify-center items-center max-h-5">
             <svg
