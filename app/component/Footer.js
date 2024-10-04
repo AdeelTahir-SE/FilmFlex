@@ -1,5 +1,7 @@
 import React from "react";
 import Link from "next/link";
+import handleSubscription from "../actions/handlesubscription";
+
 
 export default function Footer() {
   return (
@@ -21,65 +23,32 @@ export default function Footer() {
         <div>
           <h2 className="text-xl font-bold mb-4 text-red-700">Quick Links</h2>
           <ul className="space-y-2">
+         
             <li>
-              <a href="/about-us" className="text-gray-400 hover:text-white">
-                About Us
-              </a>
-            </li>
-            <li>
-              <a href="/contact-us" className="text-gray-400 hover:text-white">
+              <a href="/faq&support" className="text-gray-400 hover:text-white">
                 Contact Us
               </a>
             </li>
             <li>
-              <a href="/faq" className="text-gray-400 hover:text-white">
+              <a href="/faq&support" className="text-gray-400 hover:text-white">
                 FAQ
               </a>
             </li>
             <li>
-              <a href="/support" className="text-gray-400 hover:text-white">
+              <a href="/faq&support" className="text-gray-400 hover:text-white">
                 Support
               </a>
             </li>
-            <li>
-              <a
-                href="/privacy-policy"
-                className="text-gray-400 hover:text-white"
-              >
-                Privacy Policy
-              </a>
-            </li>
-            <li>
-              <a
-                href="/terms-of-service"
-                className="text-gray-400 hover:text-white"
-              >
-                Terms of Service
-              </a>
-            </li>
+          
             <li>
               {" "}
               {/* Social Media Links */}
               <div className="container mx-auto mt-6 flex justify-center space-x-4">
-                <Link
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-white"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path d="M22.675 0h-21.35C.595 0 0 .595 0 1.325v21.351C0 23.405.595 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.794.715-1.794 1.763v2.31h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.325-.595 1.325-1.324V1.325C24 .595 23.405 0 22.675 0z" />
-                  </svg>
-                </Link>
+              
              
                 
                 <Link
-                  href="https://linkedin.com"
+                  href="https://www.linkedin.com/in/adeel-tahir-fullstackdeveoper/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-white"
@@ -94,7 +63,7 @@ export default function Footer() {
                   </svg>
                 </Link>
                 <Link
-                  href="https://github.com"
+                  href="https://github.com/AdeelTahir-SE"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-white"
@@ -121,10 +90,11 @@ export default function Footer() {
             Subscribe to our newsletter to get the latest updates on new movies
             and special offers.
           </p>
-          <form className="flex flex-col space-y-2">
+          <form className="flex flex-col space-y-2" onSubmit={handleSubscription}>
             <input
               type="email"
               placeholder="Enter your email"
+              id="email"
               className="p-2 rounded bg-gray-700 text-white"
               required
             />

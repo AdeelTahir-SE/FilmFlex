@@ -18,12 +18,12 @@ export default function Navbar() {
           <li className="cursor-pointer  text-red-700">FilmFlex</li>
         </Link>
         <Link href="/movies">
-          <li className="cursor-pointer text-red-700">Reserve</li>
+          <li className="cursor-pointer text-red-700">Reserve Now!</li>
         </Link>
         <Link href="/notifications">
           <li className="cursor-pointer filter invert flex justify-center items-center max-h-5">
             <svg
-            className="h-6 w-6"
+            className="h-5 w-5"
               version="1.1"
               id="Layer_1"
               xmlns="http://www.w3.org/2000/svg"

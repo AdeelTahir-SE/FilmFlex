@@ -16,6 +16,24 @@ module.exports = {
 		  },
 
   		keyframes: {
+			spotlight: {
+				"0%": {
+				  opacity: 0,
+				  transform: "translate(-72%, -62%) scale(0.5)",
+				},
+				"100%": {
+				  opacity: 1,
+				  transform: "translate(-50%,-40%) scale(1)",
+				},
+			},
+			meteor: {
+				"0%": { transform: "rotate(215deg) translateX(0)", opacity: "1" },
+				"70%": { opacity: "1" },
+				"100%": {
+				  transform: "rotate(215deg) translateX(-500px)",
+				  opacity: "0",
+				},
+			  },
 			fadeIn :{
 			'0%': {
 				opacity: '0'
@@ -79,10 +97,13 @@ module.exports = {
   			}
   		},
   		animation: {
+		    meteoreffect: "meteor 5s linear infinite",
   			animatescroll: 'scroll 15s linear infinite',
   			flicker: 'flicker 1.5s ease-in-out infinite alternate',
   			glow: 'glow 1.5s ease-in-out 1',
 			  fadeIn: 'fadeIn 1s ease-in-out',
+			  spotlight: "spotlight 2s ease .75s 1 forwards",
+
 
   		},
 		

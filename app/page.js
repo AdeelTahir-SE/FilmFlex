@@ -6,7 +6,7 @@ import { FaStar } from "react-icons/fa";
 import WhyJoin from "./component/WhyJoin";
 import Link from "next/link";
 import useInViewAnimation from "@/app/component/useInView";
-
+import { Spotlight } from "./component/ui/Spotlight";
 function Customers({ comment, name, avatar, rating, date }) {
   const [ref, hasBeenInView] = useInViewAnimation({ triggerOnce: true });
 
@@ -56,14 +56,17 @@ export default function Home() {
 
   return (
     <div className="flex flex-col bg-black min-h-screen">
-      {/* Hero Section */}
       <header
         className="relative bg-cover bg-center h-screen"
         style={{ backgroundImage: 'url(https://www.shutterstock.com/image-vector/cinema-hall-white-blank-screen-600nw-2469487367.jpg)' }}
       >
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white">
-          <h1 className="text-6xl font-bold mb-4">Welcome to Film Flex</h1>
+        <Spotlight
+        className="-top-40 left-0 md:left-60 md:-top-20"
+        fill="white"
+      />
+          <h1 className="text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-50 to-slate-700">Welcome to Film Flex</h1>
           <p className="text-2xl mb-8">
             Book your movie tickets easily and quickly
           </p>
@@ -77,7 +80,7 @@ export default function Home() {
       {/* Trending Movies Section */}
       <main className="flex flex-col items-center justify-center px-4 py-8">
         <section ref={ref} className={`w-full max-w-6xl mt-8 text-center transition-opacity duration-1000 ${hasBeenInView ? 'opacity-100' : 'opacity-0'}`}>
-          <h2 className="text-white font-bold text-4xl mb-4">Trending Movies</h2>
+          <h2 className=" font-bold text-4xl mb-4 text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-50 to-slate-700">Trending Movies</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {trendingMovies.map((movie, index) => (
               <div
@@ -118,7 +121,7 @@ export default function Home() {
         <WhyJoin />
 
         <section className="w-full max-w-6xl mt-12 text-center">
-          <h2 className="text-white font-bold text-4xl mb-4">
+          <h2 className="text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-50 to-slate-700 font-bold text-4xl mb-4">
             What Our Users Say
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

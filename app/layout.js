@@ -1,7 +1,6 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import Footer from "./component/Footer";
-import Head from "next/head";
 import Navbar from "./component/navbar";
 import Sessionwrapper from "./component/Sessionwrapper";
 const geistSans = localFont({
@@ -27,15 +26,14 @@ export default function RootLayout({ children }) {
       <html lang="en">
         <head>
           <link rel="icon" href="/filmflexlogo2.png" type="image/png" />
-        </head>
-        <Head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
           <link
             href="https://fonts.googleapis.com/css2?family=Creepster&display=swap"
             rel="stylesheet"
           />
-        </Head>
+        </head>
+      
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased `}
         >
