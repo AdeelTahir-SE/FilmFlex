@@ -16,6 +16,12 @@ export default function Seats({ noofseats, premiumseats, reservedseats, containe
   const [selectedSeat, setSelectedSeat] = useState(null); // State to hold selected seat number
   const [dialogType, setDialogType] = useState(""); // State to hold the type of dialog
 
+
+
+  async function handleNormalSeatBook(){
+
+  }
+  
   useEffect(() => {
     const seatElements = [];
     for (let i = 1; i <= noofseats; i++) {

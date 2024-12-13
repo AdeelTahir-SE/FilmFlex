@@ -3,9 +3,10 @@ import React, { useState } from "react";
 import Image from "next/image";
 export default function Page() {
   const [formData, setFormData] = useState({
-    name: "",
+    subject: "",
     email: "",
     question: "",
+    password:"",
   });
 
   const handleChange = (e) => {
@@ -13,9 +14,15 @@ export default function Page() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) =>{
     e.preventDefault();
-    // Handle form submission logic here
+    await fetch("/api/faqandsupport", {
+      method: "POST",
+      body: JSON.stringify(formData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     console.log("Form submitted:", formData);
   };
 
@@ -123,20 +130,6 @@ export default function Page() {
           className="bg-gray-800 p-4 rounded-lg space-y-4 w-full max-w-2xl mx-auto"
         >
           <div className="mb-4">
-            <label className="block text-gray-300 mb-2" htmlFor="name">
-              Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full p-2 rounded bg-gray-700 text-white"
-              required
-            />
-          </div>
-          <div className="mb-4">
             <label className="block text-gray-300 mb-2" htmlFor="email">
               Email
             </label>
@@ -145,6 +138,34 @@ export default function Page() {
               id="email"
               name="email"
               value={formData.email}
+              onChange={handleChange}
+              className="w-full p-2 rounded bg-gray-700 text-white"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-300 mb-2" htmlFor="password">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full p-2 rounded bg-gray-700 text-white"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-300 mb-2" htmlFor="subject">
+              Subject
+            </label>
+            <input
+              type="text"
+              id="subject"
+              name="subject"
+              value={formData.subject}
               onChange={handleChange}
               className="w-full p-2 rounded bg-gray-700 text-white"
               required
