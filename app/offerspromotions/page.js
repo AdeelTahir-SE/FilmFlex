@@ -1,93 +1,118 @@
 "use client";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Offers from "@/public/Offers.png";
 import { ShootingStars } from "@/components/ui/shooting-stars";
 import { StarsBackground } from "@/components/ui/stars-background";
 import popcornsvg from "@/public/popcorn.svg";
 
-const offers = [
-  {
-    id: 1,
-    title: "Blockbuster Weekend",
-    description: "Enjoy 50% off on all blockbuster movies this weekend!",
-    discount: "50% Off",
-    icon: (
-      <svg
-        className="text-red-500 text-4xl h-12 mb-2"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
-      </svg>
-    ),
-  },
-  {
-    id: 2,
-    title: "Double Feature Night",
-    description: "Buy one ticket, get one free for select double features.",
-    discount: "BOGO",
-    icon: (
-      <svg
-        className="text-red-500 text-4xl mb-2 h-12"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
-      </svg>
-    ),
-  },
-  {
-    id: 3,
-    title: "Free Popcorn",
-    description: "Get free popcorn with every ticket purchase over $20.",
-    discount: "Free Popcorn",
-    icon: (
-      <Image
-        src={popcornsvg}
-        alt="Popcorn Icon"
-        width={50}
-        height={50}
-        className="mb-2"
-      />
-    ),
-  },
-  // Add more offers here
-];
-
-const movieSales = [
-  {
-    id: 1,
-    title: "Inception",
-    originalPrice: "$15",
-    salePrice: "$10",
-    image: "/image.jpeg", // Add the path to the movie image
-    discountDay: "Saturday",
-    discountTime: "2:00 PM - 5:00 PM",
-  },
-  {
-    id: 2,
-    title: "The Dark Knight",
-    originalPrice: "$15",
-    salePrice: "$10",
-    image: "/image.jpeg", // Add the path to the movie image
-    discountDay: "Sunday",
-    discountTime: "3:00 PM - 6:00 PM",
-  },
-  {
-    id: 3,
-    title: "Interstellar",
-    originalPrice: "$15",
-    salePrice: "$10",
-    image: "/image.jpeg", // Add the path to the movie image
-    discountDay: "Friday",
-    discountTime: "6:00 PM - 9:00 PM",
-  },
-  // Add more movie sales here
-];
-
 export default function OffersandPromotions() {
+  const [offers, setOffers] = useState([
+    // Default data for offers
+    {
+      id: 1,
+      title: "Blockbuster Weekend",
+      description: "Enjoy 50% off on all blockbuster movies this weekend!",
+      discount: "50% Off",
+      icon: (
+        <svg
+          className="text-red-500 text-4xl h-12 mb-2"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
+        </svg>
+      ),
+    },
+    {
+      id: 2,
+      title: "Double Feature Night",
+      description: "Buy one ticket, get one free for select double features.",
+      discount: "BOGO",
+      icon: (
+        <svg
+          className="text-red-500 text-4xl mb-2 h-12"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
+        </svg>
+      ),
+    },
+    {
+      id: 3,
+      title: "Free Popcorn",
+      description: "Get free popcorn with every ticket purchase over $20.",
+      discount: "Free Popcorn",
+      icon: (
+        <Image
+          src={popcornsvg}
+          alt="Popcorn Icon"
+          width={50}
+          height={50}
+          className="mb-2"
+        />
+      ),
+    },
+  ]);
+
+  const [movieSales, setMovieSales] = useState([
+    // Default data for movie sales
+    {
+      id: 1,
+      title: "Inception",
+      originalPrice: "$15",
+      salePrice: "$10",
+      image: "/image.jpeg", // Default image path
+      discountDay: "Saturday",
+      discountTime: "2:00 PM - 5:00 PM",
+    },
+    {
+      id: 2,
+      title: "The Dark Knight",
+      originalPrice: "$15",
+      salePrice: "$10",
+      image: "/image.jpeg", // Default image path
+      discountDay: "Sunday",
+      discountTime: "3:00 PM - 6:00 PM",
+    },
+    {
+      id: 3,
+      title: "Interstellar",
+      originalPrice: "$15",
+      salePrice: "$10",
+      image: "/image.jpeg", // Default image path
+      discountDay: "Friday",
+      discountTime: "6:00 PM - 9:00 PM",
+    },
+  ]);
+
+  useEffect(() => {
+    // Fetch the offers and movie sales from the server
+    async function fetchOffersAndSales() {
+      try {
+        const [offersRes, movieSalesRes] = await Promise.all([
+          fetch("/api/offers"),
+          fetch("/api/movieSales"),
+        ]);
+        if (offersRes.ok) {
+          const offersData = await offersRes.json();
+          setOffers(offersData);
+        }
+        if (movieSalesRes.ok) {
+          const movieSalesData = await movieSalesRes.json();
+          setMovieSales(movieSalesData);
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    }
+
+    fetchOffersAndSales();
+  }, []);
+
   return (
     <div className="bg-black min-h-screen flex flex-col items-center justify-center py-10">
       <div className="flex flex-row items-center justify-center p-4 gap-10">
