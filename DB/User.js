@@ -4,7 +4,7 @@ export async function createUser(name, email, password) {
     try{
   const [result] = await connection.execute(
     "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-    [name, email, password]
+    [name, email, hashPassword(password)]
   );
 }
 catch(e){
@@ -13,16 +13,8 @@ catch(e){
   return result.insertId;
 }
 
-export async function deleteUser(email){
-    try{
-    const result=await connection.execute("DELETE FROM users WHERE email=?",[email]);
-    }
-    catch(e){
-        console.log(e);
-    }
-    return result[0];
-}
-export async function getUserByEmail(email) {
+
+export async function getUserByEmailPassword(email,password) {
     try{
   const [rows] = await connection.execute("SELECT * FROM users WHERE email = ? AND password= ?", [
     email,hashPassword(password)
