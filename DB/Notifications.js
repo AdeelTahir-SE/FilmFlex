@@ -7,16 +7,11 @@ return connection.execute("SELECT * FROM notifications WHERE userid = ?", [useri
         console.log(e);
     }
 }
-export async function createNotification(userid, message,imageurl) {
+export function getNotificationsLength(userid) {
     try{
-const [result] = await connection.execute(
-"INSERT INTO notifications (userid, message,imageurl,currentdata) VALUES (?, ?, ?, NOW())",
-[userid, message,imageurl]
-);
-return result.insertId;
+return connection.execute("SELECT COUNT(*) FROM notifications WHERE userid = ?", [userid]);
     }
     catch(e){
         console.log(e);
     }
 }
-    

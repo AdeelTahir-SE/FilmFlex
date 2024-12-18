@@ -1,73 +1,61 @@
-import Image from "next/image";
+
 import MovieSlider from "@/app/component/moviesslider";
 import DayMovies from "@/app/component/DayMovies"; // Updated import for DayMovies
 import img1 from "@/app/component/image.jpeg";
 import img2 from "@/app/component/image2.jpeg";
 import Seats from "@/app/component/Seats";
 
+// Default movie data to be used if fetching fails
+const defaultMovies = [
+  {
+    title: "Default Movie 1",
+    timing: "Monday 7:00 PM",
+    details: "An exciting adventure movie.",
+    src: img1,
+  },
+  {
+    title: "Default Movie 2",
+    timing: "Monday 8:00 PM",
+    details: "A thrilling mystery movie.",
+    src: img2,
+  },
+  // Add similar default data for other days...
+];
+
 // Server-side fetch function
 async function fetchMovies() {
-  // Simulating a fetch request to a backend or external API
-  const res = await fetch("/api/weekMovie"); // Replace with your API endpoint
-  const data = await res.json();
-  
-  // Assuming the data returned is already structured in a way you need
-  const monday = data.filter((movie) => movie.day === "Monday");
-  const tuesday = data.filter((movie) => movie.day === "Tuesday");
-  const wednesday = data.filter((movie) => movie.day === "Wednesday");
-  const thursday = data.filter((movie) => movie.day === "Thursday");
-  const friday = data.filter((movie) => movie.day === "Friday");
+  try {
+    const res = await fetch("/api/weekMovie"); // Replace with your API endpoint
+    if (!res.ok) {
+      throw new Error("Failed to fetch movies");
+    }
+    const data = await res.json();
 
-  return { monday, tuesday, wednesday, thursday, friday };
+    // Group the movies by day of the week
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    const groupedMovies = {};
+    days.forEach(day => {
+      groupedMovies[day] = data.filter(movie => movie.day === day);
+    });
+
+    return groupedMovies;
+  } catch (error) {
+    console.error(error);
+    // If fetch fails, return default data for all days
+    return {
+      Monday: defaultMovies,
+      Tuesday: defaultMovies,
+      Wednesday: defaultMovies,
+      Thursday: defaultMovies,
+      Friday: defaultMovies,
+    };
+  }
 }
 
 // React component
 export default async function Page() {
   // Fetch data server-side
-  const { monday, tuesday, wednesday, thursday, friday } = await fetchMovies();
-
-  const movies = [
-    {
-      src: img1,
-      title: "Movie 1",
-    },
-    {
-      src: img2,
-      title: "Movie 2",
-    },
-    {
-      src: img1,
-      title: "Movie 3",
-    },
-    {
-      src: img2,
-      title: "Movie 4",
-    },
-    {
-      src: img1,
-      title: "Movie 5",
-    },
-    {
-      src: img2,
-      title: "Movie 6",
-    },
-    {
-      src: img1,
-      title: "Movie 7",
-    },
-    {
-      src: img2,
-      title: "Movie 8",
-    },
-    {
-      src: img1,
-      title: "Movie 9",
-    },
-    {
-      src: img2,
-      title: "Movie 10",
-    },
-  ];
+  const movies = await fetchMovies();
 
   return (
     <div className="flex flex-col bg-black h-full">
@@ -76,7 +64,7 @@ export default async function Page() {
       </h1>
       <div className="flex flex-col items-center justify-center">
         <h2 className="text-white font-bold text-2xl">Latest</h2>
-        <MovieSlider movies={movies} />
+        <MovieSlider movies={movies.Monday} /> {/* Pass only Monday's movies here */}
       </div>
 
       <div className="flex flex-col items-center justify-center bg-black text-white min-h-screen p-4">
@@ -93,26 +81,12 @@ export default async function Page() {
 
         <div className="w-full">
           <div className="space-y-6 text-center">
-            <div className="bg-gray-950 rounded-lg shadow-glow border-b-4 border-red-600">
-              <h2 className="text-2xl font-bold text-white">Monday</h2>
-              <DayMovies dayMovies={monday} />
-            </div>
-            <div className="bg-gray-950 p-6 rounded-lg shadow-glow border-b-4 border-red-600">
-              <h2 className="text-2xl font-bold text-white">Tuesday</h2>
-              <DayMovies dayMovies={tuesday} />
-            </div>
-            <div className="bg-gray-950 p-6 rounded-lg shadow-glow border-b-4 border-red-600">
-              <h2 className="text-2xl font-bold text-white">Wednesday</h2>
-              <DayMovies dayMovies={wednesday} />
-            </div>
-            <div className="bg-gray-950 p-6 rounded-lg shadow-glow border-b-4 border-red-600">
-              <h2 className="text-2xl font-bold text-white">Thursday</h2>
-              <DayMovies dayMovies={thursday} />
-            </div>
-            <div className="bg-gray-950 p-6 rounded-lg shadow-glow border-b-4 border-red-600">
-              <h2 className="text-2xl font-bold text-white">Friday</h2>
-              <DayMovies dayMovies={friday} />
-            </div>
+            {Object.keys(movies).map((day) => (
+              <div key={day} className="bg-gray-950 p-6 rounded-lg shadow-glow border-b-4 border-red-600">
+                <h2 className="text-2xl font-bold text-white">{day}</h2>
+                <DayMovies dayMovies={movies[day]} /> {/* Pass all movies for each day */}
+              </div>
+            ))}
           </div>
         </div>
       </div>

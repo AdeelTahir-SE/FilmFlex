@@ -17,6 +17,13 @@ export async function getMoviesOnDate(date) {
 }
 
 
+export async function getTrendingMovies(){
+  const [rows] = await connection.execute(
+    "SELECT * FROM movies ORDER BY rating DESC limit 7"
+  );
+  return rows;
+}
+
 
 
 

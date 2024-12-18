@@ -3,15 +3,15 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function DayMovies({ daysMovies }) {
+export default function DayMovies({ dayMovies }) { // Changed 'daysMovies' to 'dayMovies'
   const [dayList, setDayList] = useState({});
 
   // Initialize the dayList when the component is mounted
   useEffect(() => {
-    if (Array.isArray(daysMovies)) {
-      console.log(daysMovies);
+    if (Array.isArray(dayMovies)) {
+      console.log(dayMovies);
       const days = {};
-      daysMovies.forEach((movie) => {
+      dayMovies.forEach((movie) => {
         const day = movie.timing.split(" ")[0]; // Extract the day of the week (e.g., Monday, Tuesday)
         if (!days[day]) {
           days[day] = [];
@@ -20,7 +20,7 @@ export default function DayMovies({ daysMovies }) {
       });
       setDayList(days);
     }
-  }, [daysMovies]);
+  }, [dayMovies]);
 
   return (
     <div className="py-8 px-4 flex flex-col items-center justify-center">
@@ -73,7 +73,7 @@ export default function DayMovies({ daysMovies }) {
 
       {/* Complete Details of the Week Button */}
       <div className="mt-8">
-        <Link href="/weeklymovies/1">
+        <Link href={`/weeklymovies/${Object.keys(dayList)[0]}`}>
           <button className="px-6 py-3 bg-red-600 text-white font-bold rounded-md shadow-md hover:bg-red-700 transition-colors">
             See Complete Details of the Week
           </button>

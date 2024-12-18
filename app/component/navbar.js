@@ -6,6 +6,7 @@ import filmflex from "@/public/filmflextext.png";
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
+  const [notificationslength, setNotificationsLength] = useState(5);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -15,13 +16,25 @@ export default function Navbar() {
           "Content-Type": "application/json",
         },
       });
-
+  
       if (response.ok) {
         const data = await response.json();
         if(data.user.name.length>10){
           data.user.name=data.user.name.slice(0,10)+"...";
         }
         setUser(data.user);
+        const length=await fetch(`/api/notificationslength`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const parsedResult = await length.json();
+        if (length.ok && parsedResult?.length > 0) {
+          setNotificationsLength(parsedResult.length
+          );
+        }
+        
       } else {
         console.error("Failed to fetch user data");
       }
@@ -52,29 +65,36 @@ export default function Navbar() {
           <li className="cursor-pointer text-red-700">Offers!</li>
         </Link>
         <Link href="/notifications">
-          <li className="cursor-pointer filter invert flex justify-center items-center max-h-5">
-            <svg
-              className="h-5 w-5"
-              version="1.1"
-              id="Layer_1"
-              xmlns="http://www.w3.org/2000/svg"
-              x="0px"
-              y="0px"
-              width="120.641px"
-              height="122.878px"
-              viewBox="0 0 120.641 122.878"
-              enable-background="new 0 0 120.641 122.878"
-            >
-              <g>
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M68.16,6.889c18.129,3.653,31.889,19.757,31.889,38.921 c0,22.594-2.146,39.585,20.592,54.716c-40.277,0-80.366,0-120.641,0C22.8,85.353,20.647,68.036,20.647,45.81 c0-19.267,13.91-35.439,32.182-38.979C53.883-2.309,67.174-2.265,68.16,6.889L68.16,6.889z M76.711,109.19 c-1.398,7.785-8.205,13.688-16.392,13.688c-8.187,0-14.992-5.902-16.393-13.688H76.711L76.711,109.19z"
-                />
-              </g>
-            </svg>
-          </li>
-        </Link>
+  <li className="relative cursor-pointer filter invert flex justify-center items-center max-h-5">
+    {/* Bell Icon */}
+    <svg
+      className="h-5 w-5"
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      x="0px"
+      y="0px"
+      width="120.641px"
+      height="122.878px"
+      viewBox="0 0 120.641 122.878"
+      enableBackground="new 0 0 120.641 122.878"
+    >
+      <g>
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M68.16,6.889c18.129,3.653,31.889,19.757,31.889,38.921 c0,22.594-2.146,39.585,20.592,54.716c-40.277,0-80.366,0-120.641,0C22.8,85.353,20.647,68.036,20.647,45.81 c0-19.267,13.91-35.439,32.182-38.979C53.883-2.309,67.174-2.265,68.16,6.889L68.16,6.889z M76.711,109.19 c-1.398,7.785-8.205,13.688-16.392,13.688c-8.187,0-14.992-5.902-16.393-13.688H76.711L76.711,109.19z"
+        />
+      </g>
+    </svg>
+    {/* Notification Bubble */}
+    {notificationslength > 0 && (
+      <span className="absolute top-0 left-2 filter invert bg-red-600 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center animate-bounce">
+        {notificationslength}
+      </span>
+    )}
+  </li>
+</Link>
+
         <Link href="/register">
           <li className="cursor-pointer">
             <div className="flex flex-col items-center justify-center">
