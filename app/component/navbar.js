@@ -95,7 +95,7 @@ export default function Navbar() {
   </li>
 </Link>
 
-        <Link href="/register">
+        <Link href="/profile">
           <li className="cursor-pointer">
             <div className="flex flex-col items-center justify-center">
               <svg

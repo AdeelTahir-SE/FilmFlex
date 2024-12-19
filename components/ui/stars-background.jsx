@@ -112,6 +112,6 @@ export const StarsBackground = ({
     (<canvas
       ref={canvasRef}
       
-      className={cn("h-full w-full absolute inset-0", className)} />)
+      className={cn("h-full w-full  inset-0", className)} />)
   );
 };

@@ -114,77 +114,82 @@ export default function OffersandPromotions() {
   }, []);
 
   return (
-    <div className="bg-black min-h-screen flex flex-col items-center justify-center py-10">
-      <div className="flex flex-row items-center justify-center p-4 gap-10">
-        <h1 className="text-4xl text-transparent text-center bg-clip-text bg-gradient-to-b from-red-500 via-red-700 to-black">
-          Movie Offers & Promotions
-        </h1>
-        <Image src={Offers} alt="Offers" className="w-24" />
-      </div>
+    <div className="bg-black min-h-screen flex flex-col items-center justify-between py-10 relative">
+      {/* Section with a higher z-index to be on top */}
+      <section className="relative z-20">
+        <div className="flex flex-row items-center justify-center p-4 gap-10">
+          <h1 className="text-4xl text-transparent text-center bg-clip-text bg-gradient-to-b from-red-500 via-red-700 to-black">
+            Movie Offers & Promotions
+          </h1>
+          <Image src={Offers} alt="Offers" className="w-24" />
+        </div>
 
-      {/* Offers Section */}
-      <div className="flex flex-wrap justify-center border-b-2 border-slate-600 pb-24">
-        {offers.map((offer) => (
-          <div
-            key={offer.id}
-            className="flex flex-col items-center justify-center p-6 bg-gray-900 rounded-lg shadow-lg m-4 w-80 border border-red-700 transform transition-transform hover:scale-105"
-          >
-            {offer.icon}
-            <h2 className="text-2xl text-red-500 mb-2">{offer.title}</h2>
-            <p className="text-gray-300 mb-4">{offer.description}</p>
-            <span className="text-red-600 font-bold">{offer.discount}</span>
-          </div>
-        ))}
-        <ShootingStars />
-        <StarsBackground />
-      </div>
-
-      {/* Movie Sales Section */}
-      <div className="mt-10">
-        <h2 className="text-3xl text-red-500 mb-6 text-center">
-          Movies on Sale
-        </h2>
-        <div className="flex flex-wrap justify-center">
-          {movieSales.map((movie) => (
+        {/* Offers Section */}
+        <div className="flex flex-wrap justify-center border-b-2 border-slate-600 pb-24">
+          {offers.map((offer) => (
             <div
-              key={movie.id}
+              key={offer.id}
               className="flex flex-col items-center justify-center p-6 bg-gray-900 rounded-lg shadow-lg m-4 w-80 border border-red-700 transform transition-transform hover:scale-105"
             >
-              <Image
-                src={movie.image}
-                alt={movie.title}
-                width={90}
-                height={48}
-                className="w-full h-48 object-cover mb-4 rounded"
-              />
-              <h3 className="text-2xl text-red-500 mb-2">{movie.title}</h3>
-              <p className="text-gray-300 mb-4">
-                <span className="line-through">{movie.originalPrice}</span>{" "}
-                <span className="text-red-600">{movie.salePrice}</span>
-              </p>
-              <p className="text-gray-400">
-                {movie.discountDay}, {movie.discountTime}
-              </p>
+              {offer.icon}
+              <h2 className="text-2xl text-red-500 mb-2">{offer.title}</h2>
+              <p className="text-gray-300 mb-4">{offer.description}</p>
+              <span className="text-red-600 font-bold">{offer.discount}</span>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* App Download Discount Section */}
-      <div className="mt-10">
-        <h2 className="text-3xl text-red-500 mb-6 text-center">
-          Download Our App
-        </h2>
-        <div className="flex flex-col items-center justify-center p-6 bg-gray-900 rounded-lg shadow-lg m-4 w-80 border border-red-700">
-          <p className="text-gray-300 mb-4">
-            Download our mobile app and get an additional 10% discount on your
-            first purchase!
-          </p>
-          <button className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md shadow-md hover:bg-red-700">
-            Download Now
-          </button>
+        {/* Movie Sales Section */}
+        <div className="mt-10">
+          <h2 className="text-3xl text-red-500 mb-6 text-center">
+            Movies on Sale
+          </h2>
+          <div className="flex flex-wrap justify-center">
+            {movieSales.map((movie) => (
+              <div
+                key={movie.id}
+                className="flex flex-col items-center justify-center p-6 bg-gray-900 rounded-lg shadow-lg m-4 w-80 border border-red-700 transform transition-transform hover:scale-105"
+              >
+                <Image
+                  src={movie.image}
+                  alt={movie.title}
+                  width={90}
+                  height={48}
+                  className="w-full h-48 object-cover mb-4 rounded"
+                />
+                <h3 className="text-2xl text-red-500 mb-2">{movie.title}</h3>
+                <p className="text-gray-300 mb-4">
+                  <span className="line-through">{movie.originalPrice}</span>{" "}
+                  <span className="text-red-600">{movie.salePrice}</span>
+                </p>
+                <p className="text-gray-400">
+                  {movie.discountDay}, {movie.discountTime}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+
+        {/* App Download Discount Section */}
+        <div className="mt-10">
+          <h2 className="text-3xl text-red-500 mb-6 text-center">
+            Download Our App
+          </h2>
+          <div className="flex flex-col items-center justify-center p-6 bg-gray-900 rounded-lg shadow-lg m-4 w-80 border border-red-700">
+            <p className="text-gray-300 mb-4">
+              Download our mobile app and get an additional 10% discount on
+              your first purchase!
+            </p>
+            <button className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md shadow-md hover:bg-red-700">
+              Download Now
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Shooting Stars and Background will remain below */}
+      <ShootingStars />
+      <StarsBackground />
     </div>
   );
 }
