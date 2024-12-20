@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getMovieDetails } from "@/DB/Movie";
 export async function GET(request){
     const {value} = request.cookies.get("userid");
     const userId = value;
@@ -8,7 +9,7 @@ export async function GET(request){
             { status: 401 }
         );
     }
-    const discount=await getMoviesDiscount();
+    const discount=await getMovieDetails();
     return NextResponse.json(
         { message: "Movies Discount",discount: discount },
         { status: 200 }

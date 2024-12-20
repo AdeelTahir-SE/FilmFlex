@@ -36,13 +36,16 @@ export default function page() {
   async function fetchNotifications() {
     const response = await fetch(`/api/notifications/`);
     const parsedResult = response.json();
-    if (response.ok && parsedResult?.length > 0) {
+    if (response.ok && parsedResult?.notificationslength > 0) {
       setNotifications(parsedResult);
       setIsNotifications(true);
     } else {
       setIsNotifications(false);
     }
   }
+
+
+
   useEffect(() => {
     fetchNotifications();
   }, []);
@@ -60,6 +63,7 @@ export default function page() {
             Notifications.map((element) => {
               return (
                 <NotificationCard
+                  id={element.notificationId}
                   image={element.image}
                   title={element.title}
                   message={element.message}

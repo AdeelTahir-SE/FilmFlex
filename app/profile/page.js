@@ -1,49 +1,48 @@
-"use client"
-import { useState, useEffect, useRef } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useToast } from '@/hooks/use-toast'
-import { ShootingStars } from "@/components/ui/shooting-stars"
-import { StarsBackground } from "@/components/ui/stars-background"
-import { Camera } from 'lucide-react'
+"use client";
+import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/hooks/use-toast";
+import { ShootingStars } from "@/components/ui/shooting-stars";
+import { StarsBackground } from "@/components/ui/stars-background";
+import { Camera } from "lucide-react";
 
 export default function EnhancedProfile() {
   const [userData, setUserData] = useState({
-    name: '',
-    email: '',
-    profilePicture: '',
+    name: "",
+    email: "",
+    profilePicture: "",
     reservedSeats: [],
-  })
-  const [newPassword, setNewPassword] = useState('')
-  const [newName, setNewName] = useState('')
-  const [newProfilePicture, setNewProfilePicture] = useState(null)
-  const [previewImage, setPreviewImage] = useState('') // Added preview image state
-  const fileInputRef = useRef(null)
-  const { toast } = useToast()
+  });
+  const [newPassword, setNewPassword] = useState("");
+  const [newName, setNewName] = useState("");
+  const [previewImage, setPreviewImage] = useState("");
+  const fileInputRef = useRef(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const response = await fetch('/api/user')
+        const response = await fetch("/api/user");
         if (!response.ok) {
-          throw new Error('Failed to fetch user data')
+          throw new Error("Failed to fetch user data");
         }
-        const data = await response.json()
-        setUserData(data)
-        setNewName(data.name)
+        const data = await response.json();
+        setUserData(data);
+        setNewName(data.name);
       } catch (error) {
         toast({
           title: "Error",
           description: "Failed to load user data. Please try again.",
           variant: "destructive",
-        })
+        });
       }
     }
-    fetchUserData()
-  }, [toast])
+    fetchUserData();
+  }, [toast]);
 
   const handlePasswordChange = async () => {
     if (newPassword.length < 8) {
@@ -51,102 +50,105 @@ export default function EnhancedProfile() {
         title: "Error",
         description: "Password must be at least 8 characters long.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
     try {
+      // Simulate password change API call
       toast({
         title: "Success",
         description: "Password changed successfully.",
-      })
-      setNewPassword('')
+      });
+      setNewPassword("");
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to change password. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleNameChange = async () => {
-    if (newName.trim() === '') {
+    if (newName.trim() === "") {
       toast({
         title: "Error",
         description: "Name cannot be empty.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
     try {
-      setUserData(prev => ({ ...prev, name: newName }))
+      // Simulate name change API call
+      setUserData((prev) => ({ ...prev, name: newName }));
       toast({
         title: "Success",
         description: "Name changed successfully.",
-      })
+      });
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to change name. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
-  const handleProfilePictureUpload = async () => {
-    alert(newProfilePicture)
-    if (!newProfilePicture) {
-      toast({
-        title: "Error",
-        description: "Please select an image to upload.",
-        variant: "destructive",
-      })
-      return
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Update preview
+      setPreviewImage(URL.createObjectURL(file));
+
+      const formData = new FormData();
+      formData.append("profile_picture", file);
+
+      try {
+        const res = await fetch("/api/profilepic", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          toast({
+            title: "Success",
+            description: "Profile picture uploaded successfully.",
+          });
+          setUserData((prev) => ({ ...prev, profilePicture: data.url })); // Assuming API returns a URL
+        } else {
+          toast({
+            title: "Error",
+            description: `Upload failed: ${data.error}`,
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        toast({
+          title: "Error",
+          description: "Failed to upload profile picture. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
-    try {
-      const imageUrl = URL.createObjectURL(newProfilePicture)
-      console.log(newProfilePicture)
-      console.log(imageUrl);
-      setUserData(prev => ({ ...prev, profilePicture: imageUrl }))
-      toast({
-        title: "Success",
-        description: "Profile picture uploaded successfully.",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to upload profile picture. Please try again.",
-        variant: "destructive",
-      })
-    }
-  }
+  };
 
   const handleImageClick = () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setNewProfilePicture(file)
-      const previewUrl = URL.createObjectURL(file)
-      setPreviewImage(previewUrl) // Set the preview image
-    }
-  }
+    fileInputRef.current?.click();
+  };
 
   return (
-    <div className="container mx-auto min-w-full bg-black pt-4  ">
-              <StarsBackground />
-
+    <div className="container mx-auto min-w-full bg-black pt-4">
+      <StarsBackground />
       <ShootingStars />
-      <Card className="bg-black text-red-800 max-w-lg mx-auto absolute top-24 left-0 right-0  p-4">
+      <Card className="bg-black text-red-800 max-w-lg mx-auto absolute top-24 left-0 right-0 p-4">
         <CardHeader>
           <CardTitle className="text-3xl font-bold text-center">Profile</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex flex-col items-center">
             <Avatar className="w-32 h-32 cursor-pointer" onClick={handleImageClick}>
-              {/* Show preview image if available */}
               <AvatarImage src={previewImage || userData.profilePicture} alt="Profile" />
               <AvatarFallback>
                 <Camera className="w-8 h-8" />
@@ -159,9 +161,6 @@ export default function EnhancedProfile() {
               onChange={handleImageChange}
               accept="image/*"
             />
-            <Button className="mt-4 bg-red-800 hover:cursor-pointer" onClick={handleProfilePictureUpload}>
-              Upload Profile Picture
-            </Button>
           </div>
 
           <div className="space-y-2">
@@ -196,7 +195,9 @@ export default function EnhancedProfile() {
             {userData.reservedSeats.length > 0 ? (
               <ul className="list-disc pl-5">
                 {userData.reservedSeats.map((seat, index) => (
-                  <li key={index} className="mb-1">{seat}</li>
+                  <li key={index} className="mb-1">
+                    {seat}
+                  </li>
                 ))}
               </ul>
             ) : (
@@ -205,8 +206,6 @@ export default function EnhancedProfile() {
           </div>
         </CardContent>
       </Card>
-
-   
     </div>
-  )
+  );
 }

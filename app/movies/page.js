@@ -1,4 +1,3 @@
-
 import MovieSlider from "@/app/component/moviesslider";
 import DayMovies from "@/app/component/DayMovies"; // Updated import for DayMovies
 import img1 from "@/app/component/image.jpeg";
@@ -10,14 +9,20 @@ const defaultMovies = [
   {
     title: "Default Movie 1",
     timing: "Monday 7:00 PM",
-    details: "An exciting adventure movie.",
-    src: img1,
+    description: "An exciting adventure movie.",
+    duration: "120 minutes",
+    price: "15.00",
+    movieImage: img1,
+    day: "Monday",
   },
   {
     title: "Default Movie 2",
     timing: "Monday 8:00 PM",
-    details: "A thrilling mystery movie.",
-    src: img2,
+    description: "A thrilling mystery movie.",
+    duration: "130 minutes",
+    price: "12.00",
+    movieImage: img2,
+    day: "Monday",
   },
   // Add similar default data for other days...
 ];
@@ -34,8 +39,8 @@ async function fetchMovies() {
     // Group the movies by day of the week
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
     const groupedMovies = {};
-    days.forEach(day => {
-      groupedMovies[day] = data.filter(movie => movie.day === day);
+    days.forEach((day) => {
+      groupedMovies[day] = data.filter((movie) => movie.day === day);
     });
 
     return groupedMovies;
@@ -82,9 +87,12 @@ export default async function Page() {
         <div className="w-full">
           <div className="space-y-6 text-center">
             {Object.keys(movies).map((day) => (
-              <div key={day} className="bg-gray-950 p-6 rounded-lg shadow-glow border-b-4 border-red-600">
+              <div
+                key={day}
+                className="bg-gray-950 p-6 rounded-lg shadow-glow border-b-4 border-red-600"
+              >
                 <h2 className="text-2xl font-bold text-white">{day}</h2>
-                <DayMovies dayMovies={movies[day]} /> {/* Pass all movies for each day */}
+                <DayMovies dayMovies={movies[day]} /> {/* Pass all movies for that day */}
               </div>
             ))}
           </div>

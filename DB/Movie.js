@@ -19,9 +19,16 @@ export async function getMoviesOnDate(date) {
 
 export async function getTrendingMovies(){
   const [rows] = await connection.execute(
-    "SELECT * FROM movies ORDER BY rating DESC limit 7"
+    "SELECT * FROM TrendingMovies "
   );
   return rows;
+}
+
+export async function getMovieDetails(){
+const [rows]=await connection.execute(
+  "SELECT * FROM MovieDetails"
+);
+return rows;
 }
 
 

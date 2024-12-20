@@ -65,3 +65,11 @@ export async function getUserById(id) {
     return null;
   }
 }
+
+export async function uploadImage(userId, profilePicture) {
+  try {
+    return await connection.execute("UPDATE User SET profilePicUrl = ? WHERE id = ?", [profilePicture, userId]);
+  } catch (e) {
+    console.log(e);
+  }
+}

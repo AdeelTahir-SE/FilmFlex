@@ -1,8 +1,8 @@
-"use client"
+"use client";
 import { useState } from "react";
 import { Vortex } from "../component/ui/vortex";
 import { useRouter } from "next/navigation"; // Next.js router to handle redirection
-
+import { FaGoogle,FaGithub } from "react-icons/fa";
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -28,7 +28,7 @@ export default function Register() {
 
       if (response.ok) {
         // On success, redirect to home page
-        router.push("/"); 
+        router.push("/");
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Something went wrong");
@@ -38,6 +38,11 @@ export default function Register() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOAuth = (provider) => {
+    // Redirect to OAuth authentication route
+    router.push(`/api/auth/${provider}`);
   };
 
   return (
@@ -50,7 +55,9 @@ export default function Register() {
         className="flex items-center flex-col justify-center w-full h-full"
       >
         <div className="bg-black p-8 rounded-lg shadow-lg max-w-md w-full opacity-80">
-          <h2 className="text-3xl font-bold text-red-500 mb-6 text-center">Register</h2>
+          <h2 className="text-3xl font-bold text-red-500 mb-6 text-center">
+            Register
+          </h2>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-300">
@@ -101,8 +108,26 @@ export default function Register() {
             </button>
           </form>
           <div className="mt-6 text-center">
+            <p className="text-gray-300">Or register using:</p>
+            <div className="flex justify-center mt-4 space-x-4">
+              <button
+                onClick={() => handleOAuth("google")}
+                className="flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-md shadow-md hover:bg-red-700"
+              >
+                Register with Google<FaGoogle/>
+              </button>
+              
+              <button
+                onClick={() => handleOAuth("github")}
+                className="flex items-center justify-center px-4 py-2 bg-gray-800 text-white rounded-md shadow-md hover:bg-gray-900"
+              >
+                Register with GitHub<FaGithub/>
+              </button>
+            </div>
+          </div>
+          <div className="mt-6 text-center">
             <p className="text-gray-300">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <a href="/Signin" className="font-medium text-red-500 hover:text-red-400">
                 Sign In
               </a>

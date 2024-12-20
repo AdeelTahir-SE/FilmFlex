@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function DayMovies({ dayMovies }) { // Changed 'daysMovies' to 'dayMovies'
+export default function DayMovies({ dayMovies }) {
   const [dayList, setDayList] = useState({});
 
   // Initialize the dayList when the component is mounted
@@ -37,7 +37,7 @@ export default function DayMovies({ dayMovies }) { // Changed 'daysMovies' to 'd
                 <Link href={`/movies/${movie.title}`} key={movieIndex}>
                   <div className="flex flex-col items-center bg-gray-950 cursor-pointer p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105 hover:shadow-2xl">
                     <div
-                      className="absolute bottom-44 left-0 text-7xl font-bold p-2"
+                      className="absolute bottom-56 left-0 text-7xl font-bold p-2"
                       style={{
                         color: "black",
                         textShadow:
@@ -48,7 +48,7 @@ export default function DayMovies({ dayMovies }) { // Changed 'daysMovies' to 'd
                     </div>
 
                     <Image
-                      src={movie.src}
+                      src={movie.movieImage}
                       alt={movie.title || `Movie ${movieIndex + 1}`}
                       width={200}
                       height={300}
@@ -62,6 +62,12 @@ export default function DayMovies({ dayMovies }) { // Changed 'daysMovies' to 'd
                       <p className="text-red-500 cursor-pointer hover:underline">
                         See details of the day
                       </p>
+
+                      {/* Showing additional details */}
+                      <p className="text-gray-300 mb-1">{movie.description}</p>
+                      <p className="text-gray-500 mb-1">Duration: {movie.duration} minutes</p>
+                      <p className="text-red-400 mb-2">Price: {movie.price}</p>
+                      <p className="text-yellow-500">Discount Day: {movie.day}</p>
                     </div>
                   </div>
                 </Link>

@@ -88,6 +88,14 @@ export default function OffersandPromotions() {
       discountTime: "6:00 PM - 9:00 PM",
     },
   ]);
+  // CREATE TABLE IF NOT EXISTS DiscountPrices (
+  //   id INT AUTO_INCREMENT PRIMARY KEY,
+  //   movieId INT NOT NULL,
+  //   discountPercentage DECIMAL(5, 2) CHECK (discountPercentage >= 0 AND discountPercentage <= 100),
+  //   discountDay ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
+  //   discountTime TIME NOT NULL,
+  //   FOREIGN KEY (movieId) REFERENCES Movie(movieId) ON DELETE CASCADE
+  // );
 
   useEffect(() => {
     // Fetch the offers and movie sales from the server
@@ -114,9 +122,12 @@ export default function OffersandPromotions() {
   }, []);
 
   return (
-    <div className="bg-black min-h-screen flex flex-col items-center justify-between py-10 relative">
-      {/* Section with a higher z-index to be on top */}
-      <section className="relative z-20">
+    <div className="bg-black min-h-screen flex flex-col items-center justify-between py-10 ">
+  < section className="absolute inset-0">
+        <ShootingStars />
+        <StarsBackground />
+        </section>     
+   
         <div className="flex flex-row items-center justify-center p-4 gap-10">
           <h1 className="text-4xl text-transparent text-center bg-clip-text bg-gradient-to-b from-red-500 via-red-700 to-black">
             Movie Offers & Promotions
@@ -177,19 +188,15 @@ export default function OffersandPromotions() {
           </h2>
           <div className="flex flex-col items-center justify-center p-6 bg-gray-900 rounded-lg shadow-lg m-4 w-80 border border-red-700">
             <p className="text-gray-300 mb-4">
-              Download our mobile app and get an additional 10% discount on
-              your first purchase!
+              Download our mobile app and get an additional 10% discount on your
+              first purchase!
             </p>
             <button className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md shadow-md hover:bg-red-700">
               Download Now
             </button>
           </div>
         </div>
-      </section>
-
-      {/* Shooting Stars and Background will remain below */}
-      <ShootingStars />
-      <StarsBackground />
+    
     </div>
   );
 }

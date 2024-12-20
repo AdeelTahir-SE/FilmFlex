@@ -1,17 +1,18 @@
 import connection from "./ConnectDB";
-export function getAllNotifications(userid) {
+export async function getAllNotifications(userid) {
     try{
-return connection.execute("SELECT * FROM notifications WHERE userid = ?", [userid]);
+return await connection.execute("SELECT * FROM UserNotifications WHERE userid = ?", [userid]);
     }
     catch(e){
         console.log(e);
     }
 }
-export function getNotificationsLength(userid) {
-    try{
-return connection.execute("SELECT COUNT(*) FROM notifications WHERE userid = ?", [userid]);
-    }
-    catch(e){
-        console.log(e);
-    }
+
+export async function deleteNotification(notificationid){
+   try{
+    return await  connection.execute("SELECT * FROM UserNotifications WHERE notificationId=?",[notificationid]);
+   }
+   catch(e){
+    console.log(e);
+   }
 }
