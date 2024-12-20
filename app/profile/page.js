@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,8 @@ export default function EnhancedProfile() {
   const [newPassword, setNewPassword] = useState("");
   const [newName, setNewName] = useState("");
   const [previewImage, setPreviewImage] = useState("");
+  const [loading, setLoading] = useState({ name: false, password: false, image: false });
+  const [error, setError] = useState({ name: "", password: "", image: "" });
   const fileInputRef = useRef(null);
   const { toast } = useToast();
 
@@ -27,13 +30,18 @@ export default function EnhancedProfile() {
     async function fetchUserData() {
       try {
         const response = await fetch("/api/user");
-        if (!response.ok) {
-          throw new Error("Failed to fetch user data");
-        }
-        const data = await response.json();
-        setUserData(data);
+        if (!response.ok) throw new Error("Failed to fetch user data");
+        const res = await response.json();
+        const data = res.user;
+        setUserData({
+          name: data.name,
+          email: data.email,
+          profilePicture: data.profilePicUrl || "",
+          reservedSeats: data.reservedSeats || [],
+        });
         setNewName(data.name);
-      } catch (error) {
+        setPreviewImage(data.profilePicUrl || "");
+      } catch {
         toast({
           title: "Error",
           description: "Failed to load user data. Please try again.",
@@ -42,100 +50,68 @@ export default function EnhancedProfile() {
       }
     }
     fetchUserData();
-  }, [toast]);
+  }, []);
 
-  const handlePasswordChange = async () => {
-    if (newPassword.length < 8) {
-      toast({
-        title: "Error",
-        description: "Password must be at least 8 characters long.",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handleAttributeChange = async (attribute, info) => {
+    setLoading((prev) => ({ ...prev, [attribute]: true }));
+    setError((prev) => ({ ...prev, [attribute]: "" }));
+
     try {
-      // Simulate password change API call
+      const response = await fetch("/api/user", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ attribute, info }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update attribute");
+
+      setUserData((prev) => ({
+        ...prev,
+        [attribute]: attribute === "name" ? info : prev[attribute],
+      }));
+
       toast({
         title: "Success",
-        description: "Password changed successfully.",
+        description: `${attribute.charAt(0).toUpperCase() + attribute.slice(1)} updated successfully.`,
       });
-      setNewPassword("");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to change password. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
-  const handleNameChange = async () => {
-    if (newName.trim() === "") {
-      toast({
-        title: "Error",
-        description: "Name cannot be empty.",
-        variant: "destructive",
-      });
-      return;
-    }
-    try {
-      // Simulate name change API call
-      setUserData((prev) => ({ ...prev, name: newName }));
-      toast({
-        title: "Success",
-        description: "Name changed successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to change name. Please try again.",
-        variant: "destructive",
-      });
+      if (attribute === "name") setNewName(info);
+      if (attribute === "password") setNewPassword(info);
+    } catch {
+      setError((prev) => ({
+        ...prev,
+        [attribute]: `Failed to update ${attribute}. Please try again.`,
+      }));
+    } finally {
+      setLoading((prev) => ({ ...prev, [attribute]: false }));
     }
   };
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Update preview
+      setLoading((prev) => ({ ...prev, image: true }));
+      setError((prev) => ({ ...prev, image: "" }));
       setPreviewImage(URL.createObjectURL(file));
 
       const formData = new FormData();
       formData.append("profile_picture", file);
 
       try {
-        const res = await fetch("/api/profilepic", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await res.json();
-        if (res.ok) {
-          toast({
-            title: "Success",
-            description: "Profile picture uploaded successfully.",
-          });
-          setUserData((prev) => ({ ...prev, profilePicture: data.url })); // Assuming API returns a URL
+        const response = await fetch("/api/profilepic", { method: "POST", body: formData });
+        const data = await response.json();
+        if (response.ok) {
+          setUserData((prev) => ({ ...prev, profilePicture: data.url }));
+          toast({ title: "Success", description: "Profile picture uploaded successfully." });
         } else {
-          toast({
-            title: "Error",
-            description: `Upload failed: ${data.error}`,
-            variant: "destructive",
-          });
+          throw new Error(data.error || "Unknown error");
         }
-      } catch (error) {
-        console.error(error);
-        toast({
-          title: "Error",
-          description: "Failed to upload profile picture. Please try again.",
-          variant: "destructive",
-        });
+      } catch {
+        setError((prev) => ({ ...prev, image: "Failed to upload profile picture. Please try again." }));
+      } finally {
+        setLoading((prev) => ({ ...prev, image: false }));
       }
     }
-  };
-
-  const handleImageClick = () => {
-    fileInputRef.current?.click();
   };
 
   return (
@@ -148,7 +124,7 @@ export default function EnhancedProfile() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex flex-col items-center">
-            <Avatar className="w-32 h-32 cursor-pointer" onClick={handleImageClick}>
+            <Avatar className="w-32 h-32 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
               <AvatarImage src={previewImage || userData.profilePicture} alt="Profile" />
               <AvatarFallback>
                 <Camera className="w-8 h-8" />
@@ -161,7 +137,15 @@ export default function EnhancedProfile() {
               onChange={handleImageChange}
               accept="image/*"
             />
+            {error.image && <p className="text-red-500 text-sm">{error.image}</p>}
           </div>
+          <Button
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full bg-red-800"
+            disabled={loading.image}
+          >
+            {loading.image ? "Uploading..." : "Upload Image"}
+          </Button>
 
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
@@ -170,9 +154,15 @@ export default function EnhancedProfile() {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="Change Name"
+              disabled={loading.name}
             />
-            <Button onClick={handleNameChange} className="w-full bg-red-800">
-              Change Name
+            {error.name && <p className="text-red-500 text-sm">{error.name}</p>}
+            <Button
+              onClick={() => handleAttributeChange("name", newName)}
+              className="w-full bg-red-800"
+              disabled={loading.name}
+            >
+              {loading.name ? "Updating..." : "Change Name"}
             </Button>
           </div>
 
@@ -184,9 +174,15 @@ export default function EnhancedProfile() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Change Password"
+              disabled={loading.password}
             />
-            <Button onClick={handlePasswordChange} className="w-full bg-red-800">
-              Change Password
+            {error.password && <p className="text-red-500 text-sm">{error.password}</p>}
+            <Button
+              onClick={() => handleAttributeChange("password", newPassword)}
+              className="w-full bg-red-800"
+              disabled={loading.password}
+            >
+              {loading.password ? "Updating..." : "Change Password"}
             </Button>
           </div>
 

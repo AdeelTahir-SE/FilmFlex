@@ -9,14 +9,14 @@ const connection = await mysql.createConnection({
 
 const createTables = async () => {
   try {
-    // User table
+    await connection.execute(`CREATE DATABASE IF NOT EXISTS FilmFlex`);
     await connection.execute(`
             CREATE TABLE IF NOT EXISTS User (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
                 email VARCHAR(255) UNIQUE NOT NULL,
-                hashedPassword VARCHAR(255) NOT NULL,
-                profilePicUrl LONGBLOB
+                password VARCHAR(255) NOT NULL,
+                profilePicUrl VARCHAR(255)
             );
         `);
 
@@ -26,7 +26,7 @@ const createTables = async () => {
                 adminId INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
                 email VARCHAR(255) UNIQUE NOT NULL,
-                hashedPassword VARCHAR(255) NOT NULL
+                password VARCHAR(255) NOT NULL
             );
         `);
 
@@ -79,12 +79,11 @@ const createTables = async () => {
             CREATE TABLE IF NOT EXISTS MovieImage (
                 imageId INT AUTO_INCREMENT PRIMARY KEY,
                 movieId INT NOT NULL,
-                imageUrl LONGBLOB NOT NULL,
+                imageUrl VARCHAR(255) NOT NULL,
                 FOREIGN KEY (movieId) REFERENCES Movie(movieId) ON DELETE CASCADE
             );
         `);
 
-    // Reviews table
     await connection.execute(`
             CREATE TABLE IF NOT EXISTS Reviews (
                 reviewId INT AUTO_INCREMENT PRIMARY KEY,
@@ -166,38 +165,12 @@ const createTables = async () => {
             );
         `);
 
-    //views
-    await connection.execute(`
-            CREATE VIEW MovieDetails AS
-SELECT
-    m.movieId,
-    m.name AS title,
-    m.description,
-    mt.duration,
-    mt.timings,
-    mg.genre,
-    mp.price,
-    mi.imageUrl AS movieImage,
-    dp.discountDay AS day
-FROM
-    Movie m
-    NATURAL JOIN MovieGenres mg
-    NATURAL JOIN MovieTimings mt
-    NATURAL JOIN MoviePrices mp
-    NATURAL JOIN MovieImage mi
-    NATURAL JOIN DiscountPrices dp;
-`);
-    await connection.execute(`
-    CREATE VIEW TrendingMovies AS
-SELECT
-name as title,description,imageurl FROM Movie NATURAL JOIN MovieImage NATURAL JOIN Reviews GROUP BY movieid ORDER BY SUM(rating) limit 7
-`);
+ 
+    
     console.log("Tables created successfully!");
   } catch (error) {
     console.error("Error creating tables:", error);
-  } finally {
-    await connection.end();
-  }
+  } 
 };
 
 createTables();

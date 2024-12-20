@@ -5,7 +5,7 @@ export async function createUser(name, email, password) {
   let result;
     try{
    [result] = await connection.execute(
-    "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+    "INSERT INTO User (name, email, password) VALUES (?, ?, ?)",
     [name, email, await hashPassword(password)]
   );
 }
@@ -23,7 +23,7 @@ export async function LoginUser(email, password) {
     console.log(email);
     console.log(password);
 
-    [rows] = await connection.execute("SELECT * FROM users WHERE email = ?", [email]);
+    [rows] = await connection.execute("SELECT * FROM User WHERE email = ?", [email]);
 
     if (rows.length === 0) {
       console.log("No user found with this email.");
@@ -54,7 +54,21 @@ export async function getUserById(id) {
   console.log(id)
   let rows;
   try {
-    [rows] = await connection.execute("SELECT * FROM users WHERE id = ?", [id]);
+    [rows] = await connection.execute("SELECT * FROM USER WHERE id = ?", [id]);
+      console.log(rows[0]);
+      return rows[0];
+    
+    return rows[0];
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}
+
+export async function uploadImage(userId,path){
+  let rows;
+  try {
+    [rows] = await connection.execute("UPDATE User SET profilePicUrl = ? WHERE id = ?", [path,userId]);
     if (rows.length === 0) {
       console.log("No user found with this ID.");
       return null;
@@ -66,10 +80,20 @@ export async function getUserById(id) {
   }
 }
 
-export async function uploadImage(userId, profilePicture) {
+export async function updateAttribute(id,attribute,info){
+  let rows;
   try {
-    return await connection.execute("UPDATE User SET profilePicUrl = ? WHERE id = ?", [profilePicture, userId]);
+    if(attribute==="password"){
+      info=await hashPassword(info);
+    }
+    [rows] = await connection.execute(`UPDATE User SET ${attribute} = ? WHERE id = ?`, [info,id]);
+    if (rows.length === 0) {
+      console.log("No user found with this ID.");
+      return null;
+    }
+    return rows[0];
   } catch (e) {
     console.log(e);
+    return null;
   }
 }
