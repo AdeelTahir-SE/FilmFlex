@@ -10,7 +10,7 @@ return await connection.execute("SELECT * FROM UserNotifications WHERE userid = 
 
 export async function deleteNotification(notificationid){
    try{
-    return await  connection.execute("SELECT * FROM UserNotifications WHERE notificationId=?",[notificationid]);
+    return await  connection.execute("DELETE FROM UserNotifications WHERE notificationId=?",[notificationid]);
    }
    catch(e){
     console.log(e);

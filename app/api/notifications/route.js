@@ -14,7 +14,7 @@ export async function GET(request) {
       {
         message: "Notifications",
         notifications: notifications,
-        notificationslength: notifications.length,
+        notificationslength: notifications[0].length,
       },
       { status: 200 }
     );
@@ -26,26 +26,30 @@ export async function GET(request) {
     );
   }
 }
-
 export async function DELETE(request) {
-  const { id } = request.query.id;
+  // Get the notification ID from query parameters
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id'); // Extract `id` from the query
+
   if (!id) {
     return NextResponse.json(
       { message: "No notification id found" },
-      { status: 401 }
+      { status: 400 } // 400 Bad Request instead of 401 Unauthorized
     );
   }
+
   try {
+    // Assuming deleteNotification is a function that deletes the notification from your database
     await deleteNotification(id);
 
     return NextResponse.json(
-      { message: "Notification deleted succesfully" },
+      { message: "Notification deleted successfully" },
       { status: 200 }
     );
   } catch (e) {
-    console.log("Error:", e);
+    console.error("Error:", e);
     return NextResponse.json(
-      { message: "Error getting notifications" },
+      { message: "Error deleting notification" },
       { status: 500 }
     );
   }

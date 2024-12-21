@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { FaGem, FaCheckCircle, FaTimesCircle } from "react-icons/fa"; // Importing the icons
 
-export default function Seats({ noofseats, premiumseats, reservedseats, containers, cols }) {
+export default function Seats({ noofseats, premiumseats, reservedseats, containers, cols,movieId,seatId }) {
   const [seats, setSeats] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
   const [selectedSeat, setSelectedSeat] = useState(null); // State to hold selected seat number

@@ -13,7 +13,7 @@ export async function POST(request) {
       { status: 200 }
     );
 
-    // Set the cookie for the user ID
+console.log(userId);
     response.cookies.set("userid", userId, {
       httpOnly: true, // Add more cookie options like secure, path, etc.
       sameSite: "strict", // Adjust as per your requirements
@@ -21,8 +21,13 @@ export async function POST(request) {
 
     });
 
-
+if(userId)
     return response;
+  else
+    return NextResponse.json(
+      { message: "Error creating user" },
+      { status: 500 }
+    );
   } catch (error) {
     console.error("Error:", error);
     return NextResponse.json(

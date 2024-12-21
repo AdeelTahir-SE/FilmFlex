@@ -25,62 +25,52 @@ export async function POST(req) {
     if (!file) {
       return NextResponse.json({
         error: "No file uploaded",
-      },{status:500});
+      }, { status: 400 });
     }
 
-    
-    // Extract the userId from request headers or cookies
-    // For demonstration purposes, let's assume you have userId in headers (you can customize this based on your app)
-    const {value} = req.cookies.get("userid");
-    const userId=value;
+    // Extract the userId from request cookies
+    const { value } = req.cookies.get("userid");
+    const userId = value;
+
     if (!userId) {
       return NextResponse.json({
         error: "No userId found in the request",
-      },{status:500});
+      }, { status: 400 });
     }
 
     // Read the content of the file as an array buffer (for binary files)
     const arrayBuffer = await file.arrayBuffer();
-
-    // Convert the ArrayBuffer to a Buffer to upload it to Cloudinary
     const buffer = Buffer.from(arrayBuffer);
 
-    cloudinary.v2.uploader.upload_stream(
+    // Upload to Cloudinary using promise-based API
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.v2.uploader.upload_stream(
         {
           resource_type: "auto", // Automatically detect the file type
           public_id: `profile_pictures/${userId}`, // Use userId as the custom name for the file
         },
         (error, result) => {
           if (error) {
-            console.error("Cloudinary upload error:", error);
-            return NextResponse.json(
-              {
-                error: "Failed to upload file to Cloudinary",
-              },
-              { status: 500 }
-            );
+            reject(error); // Reject the promise if there's an error
+          } else {
+            resolve(result); // Resolve with the result if successful
           }
-      
-          console.log("Cloudinary upload result:", result);
-      
-          // Call your function to save the uploaded image URL in the database
-          uploadImage(userId, result.secure_url);
-      
-          return NextResponse.json(
-            {
-              message: "File uploaded successfully to Cloudinary",
-              url: result.secure_url, // URL of the uploaded image
-            },
-            { status: 200 }
-          );
         }
       ).end(buffer);
-      
+    });
+
+    // Save the uploaded image URL in the database
+    await uploadImage(userId, uploadResult.secure_url);
+
+    return NextResponse.json({
+      message: "File uploaded successfully to Cloudinary",
+      url: uploadResult.secure_url, // URL of the uploaded image
+    }, { status: 200 });
+
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json({
       error: error.message || "Failed to process file",
-    },{status:500});
+    }, { status: 500 });
   }
 }
-
