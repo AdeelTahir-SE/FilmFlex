@@ -29,7 +29,8 @@ const MovieTrailer = ({ trailerlink, thumbnail }) => {
         >
           {/* Movie Thumbnail */}
           <Image
-         
+         width={800}
+         height={450}
             className="w-full h-full object-cover"
             src={thumbnail}
             alt="Movie Thumbnail"

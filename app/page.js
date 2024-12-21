@@ -1,7 +1,5 @@
 "use client";
 import Image from "next/image";
-import img1 from "@/app/component/image.jpeg";
-import img2 from "@/app/component/image2.jpeg";
 import { FaStar } from "react-icons/fa";
 import WhyJoin from "./component/WhyJoin";
 import Link from "next/link";
@@ -46,54 +44,25 @@ function Customers({ comment, name, avatar, rating, date }) {
 }
 
 export default function Home() {
-  const [trendingMovies, setTrendingMovies] = useState([
-    { src: img1, title: "Trending Movie 1", description: "An exciting adventure movie." },
-    { src: img2, title: "Trending Movie 2", description: "A thrilling mystery movie." },
-    { src: img1, title: "Trending Movie 3", description: "A heartwarming drama movie." },
-    { src: img2, title: "Trending Movie 4", description: "A hilarious comedy movie." },
-    { src: img1, title: "Trending Movie 5", description: "An action-packed superhero movie." },
-  ]);
-
-  const [reviews, setReviews] = useState([
-    {
-      comment: "This is an amazing service!",
-      name: "John Doe",
-      avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4oLLQanJaw4t11-7KzAAFJG4sbQj53qGemg&s",
-      rating: 4,
-      date: "2024-09-24T12:34:56Z",
-    },
-    {
-      comment: "This is an amazing service! lorem12",
-      name: "Jane Doe",
-      avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4oLLQanJaw4t11-7KzAAFJG4sbQj53qGemg&s",
-      rating: 5,
-      date: "2024-09-25T14:00:00Z",
-    },
-    {
-      comment: "Fantastic platform, very user-friendly!",
-      name: "Alice Smith",
-      avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4oLLQanJaw4t11-7KzAAFJG4sbQj53qGemg&s",
-      rating: 5,
-      date: "2024-09-26T10:15:30Z",
-    },
-  ]);
+  const [trendingMovies, setTrendingMovies] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
   const [ref, hasBeenInView] = useInViewAnimation({ triggerOnce: true });
 
   useEffect(() => {
     async function fetchTrendingMovies() {
-      const response = await fetch(`/api/trendingMovies/`);
+      const response = await fetch(`/api/trendingMovies`);
       const parsedResult = await response.json();
-      if (response.ok && parsedResult?.length > 0) {
-        setTrendingMovies(parsedResult);
+      if (response.ok) {
+        setTrendingMovies(parsedResult.trendingMovies);
       }
     }
 
     async function fetchReviews() {
       const response = await fetch(`/api/reviews/`);
       const parsedResult = await response.json();
-      if (response.ok && parsedResult?.length > 0) {
-        setReviews(parsedResult);
+      if (response.ok ) {
+        setReviews(parsedResult.reviews);
       }
     }
 
@@ -141,15 +110,17 @@ export default function Home() {
             Trending Movies
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trendingMovies.map((movie, index) => (
+            {trendingMovies.map((movie,index) => (
               <div
-                key={index}
+                key={movie.movieId}
                 className="bg-gray-800 p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105 hover:bg-gray-700"
               >
                 <div className="relative">
                   <Image
-                    src={movie.src}
-                    alt={movie.title}
+                    src={movie.movieImage}
+                    alt={movie.movieName}
+                    width={300}
+                    height={450}
                     className="rounded-lg mb-4"
                   />
                   <div
@@ -165,10 +136,13 @@ export default function Home() {
                   <div className="absolute inset-0 bg-black opacity-25 rounded-lg"></div>
                 </div>
                 <h3 className="text-xl font-bold text-red-500 mb-2">
-                  {movie.title}
+                  {movie.movieName}
                 </h3>
-                <p className="text-gray-300 mb-4">{movie.description}</p>
-                <Link href={`/movies/${movie.title}`}>
+                <p className="text-gray-300 mb-4">{movie.genres}</p>
+                <p className="text-gray-300 mb-4">Rating: {movie.movieRatings}</p>
+                <p className="text-gray-300 mb-4">Reservations: {movie.reservationCount}</p>
+                <p className="text-gray-300 mb-4">Average Rating: {movie.averageRating}</p>
+                <Link href={`/movies/${movie.movieId}`}>
                   <span className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                     Watch Now
                   </span>
@@ -186,14 +160,14 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {reviews.length > 0
-              ? reviews.map((review, index) => (
+              ? reviews.map((review) => (
                   <Customers
-                    key={index}
-                    comment={review.comment}
-                    name={review.name}
-                    avatar={review.avatar}
-                    rating={review.rating}
-                    date={review.date}
+                    key={review.userId}
+                    comment={review.userComment}
+                    name={review.userName}
+                    avatar={review.userAvatar}
+                    rating={review.userRating}
+                    date={review.reviewDate}
                   />
                 ))
               : null}

@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
-import getMoviesDiscount from "@/DB/Discount";
+import {getAllDiscounts} from "@/DB/Discount";
 export async function GET(request){
-    const {value} = request.cookies.get("userid");
-    const userId = value;
-    if (!userId) {
-        return NextResponse.json(
-            { message: "Unauthorized" },
-            { status: 401 }
-        );
-    }
-    const discount=await getMoviesDiscount();
+
+    const discount=await getAllDiscounts();
+    console.log(discount);
     return NextResponse.json(
         { message: "Movies Discount",discount: discount },
         { status: 200 }

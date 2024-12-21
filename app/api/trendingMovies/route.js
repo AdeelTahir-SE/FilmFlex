@@ -1,8 +1,9 @@
-import NextResponse from "next/server";
-import { getTrendingMovies } from "@/DB/Movies";
-export async function GET(){
+import {NextResponse} from "next/server";
+import { getTrendingMovies } from "@/DB/Movie";
+export async function GET(request){
     try{
         const trendingMovies=await getTrendingMovies();
+        console.log("Trending Movies:",trendingMovies);
         return NextResponse.json(
             { message: "Trending Movies",trendingMovies: trendingMovies },
             { status: 200 }

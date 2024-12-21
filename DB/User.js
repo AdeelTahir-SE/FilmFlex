@@ -97,3 +97,16 @@ export async function updateAttribute(id,attribute,info){
     return null;
   }
 }
+
+
+export async function displayAllReview(){
+  let rows;
+  try {
+    [rows] = await connection.execute("SELECT* FROM UserReviews");
+    console.log(rows);
+    return rows;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}

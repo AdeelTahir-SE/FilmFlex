@@ -19,7 +19,18 @@ export async function getMoviesOnDate(date) {
 
 export async function getTrendingMovies(){
   const [rows] = await connection.execute(
-    "SELECT * FROM TrendingMovies "
+    `
+SELECT 
+    movieId, 
+    movieName, 
+    movieRatings, 
+    reservationCount, 
+    averageRating, 
+    genres, 
+    movieImage
+FROM TrendingMovies
+ORDER BY averageRating DESC
+LIMIT 3`
   );
   return rows;
 }
@@ -35,15 +46,33 @@ return rows;
 
 
 export async function getMovie(id) {
-  const [rows] = await connection.execute("SELECT * FROM movies WHERE id = ?", [
+  const [rows] = await connection.execute("SELECT * FROM MovieDetailsWithReviews WHERE movieId = ?", [
     id,
   ]);
   return rows[0];
 }
 
 
+export async function getMovieReviews(id) {
+  const [rows] = await connection.execute("SELECT * FROM Reviews INNER JOIN User ON User.id=Reviews.userId WHERE movieId = ?", [id]);
+  return rows;
+}
 
+export async function addMovieReview(movieId, userId, rating, desc) {
+  const [result] = await connection.execute(
+    "INSERT INTO Reviews (movieId, userId, rating, `desc`) VALUES (?, ?, ?, ?)",
+    [movieId, userId, rating, desc]
+  );
 
+  if (result.affectedRows === 0) {
+    throw new Error("Failed to add the review.");
+  }
+
+  return {
+    message: "Review added successfully.",
+    reviewId: result.insertId,
+  };
+}
 
 
 
@@ -77,5 +106,22 @@ export async function updateSeatStatus(seatNumber, movieid, status) {
     movieid,
     seatNumber,
     status,
+  };
+}
+
+
+async function comment(movieId, userId, rating, desc) {
+  const [result] = await connection.execute(
+    "INSERT INTO Reviews (movieId, userId, rating, desc) VALUES (?, ?, ?, ?)",
+    [movieId, userId, rating, desc]
+  );
+
+  if (result.affectedRows === 0) {
+    throw new Error("Failed to add the review.");
+  }
+
+  return {
+    message: "Review added successfully.",
+    reviewId: result.insertId,
   };
 }

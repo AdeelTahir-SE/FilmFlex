@@ -165,12 +165,120 @@ const createTables = async () => {
             );
         `);
 
- 
+    await connection.execute(`
+          
+CREATE OR REPLACE VIEW TrendingMovies AS
+SELECT 
+    m.MovieId AS movieId,
+    m.name AS movieName,
+    m.description,
+    m.trailer,
+    m.movieRatings,
+    COUNT(r.reservationId) AS reservationCount, -- Count of reservations for the movie
+    AVG(rev.rating) AS averageRating, -- Average rating from reviews
+    GROUP_CONCAT(DISTINCT mg.genre) AS genres, -- Concatenate movie genres
+    ANY_VALUE(mi.imageUrl) AS movieImage -- Get any image URL for the movie
+FROM 
+    Movie AS m
+JOIN 
+    Reservation AS r ON m.MovieId = r.movieId
+LEFT JOIN 
+    Reviews AS rev ON m.MovieId = rev.movieId
+LEFT JOIN 
+    MovieGenres AS mg ON m.MovieId = mg.movieId
+LEFT JOIN 
+    MovieImage AS mi ON m.MovieId = mi.movieId -- Join with MovieImage table to get the image URL
+GROUP BY 
+    m.MovieId
+ORDER BY 
+    reservationCount DESC, averageRating DESC
+LIMIT 7;
+
+        `);
+    await connection.execute(`
+       
+CREATE OR REPLACE VIEW UserReviews AS
+SELECT 
+    u.id AS userId,
+    u.name AS userName,
+    u.profilePicUrl AS userAvatar, 
+    r.rating AS userRating,
+    r.desc AS userComment,
+    r.timestamp AS reviewDate
+FROM 
+    Reviews r
+JOIN 
+    User u ON r.userId = u.id
+ORDER BY 
+    r.timestamp DESC LIMIT 3;
+
+
+        `);
+
+    await connection.execute(`
+            CREATE OR REPLACE VIEW MovieSales AS
+SELECT 
+    m.MovieId AS movieId,
+    m.name AS movieName,
+    mp.price AS originalPrice,
+    dp.discountPercentage,
+    dp.discountDay,
+    dp.discountTime,
+    (mp.price - (mp.price * dp.discountPercentage / 100)) AS salePrice,
+    mi.imageUrl AS movieImage -- Added Movie Image URL
+FROM 
+    MoviePrices AS mp
+JOIN 
+    DiscountPrices AS dp ON mp.movieId = dp.movieId
+JOIN 
+    Movie AS m ON mp.movieId = m.MovieId
+LEFT JOIN 
+    MovieImage AS mi ON m.MovieId = mi.movieId; -- Join with MovieImage table to get the image URL
+
+
+`);
+
+    await connection.execute(`
     
+CREATE OR REPLACE VIEW MovieDetailsWithReviews AS
+SELECT 
+    m.MovieId AS movieId,
+    m.name AS movieName,
+    m.description AS movieDescription,
+    m.trailer AS movieTrailer,
+    AVG(rev.rating) AS averageRating, -- Average rating from reviews
+    COUNT(rev.reviewId) AS totalReviews, -- Total number of reviews
+    GROUP_CONCAT(DISTINCT rev.desc ORDER BY rev.timestamp DESC) AS latestReviews, -- Concatenate reviews
+    GROUP_CONCAT(DISTINCT rev.userId ORDER BY rev.timestamp DESC) AS reviewAuthors, -- Concatenate reviewer names
+    ANY_VALUE(mi.imageUrl) AS movieImage -- Get any image URL for the movie
+FROM 
+    Movie AS m
+LEFT JOIN 
+    Reviews AS rev ON m.MovieId = rev.movieId -- Join with Reviews table to get reviews
+LEFT JOIN 
+    MovieImage AS mi ON m.MovieId = mi.movieId -- Join with MovieImage to get movie image
+GROUP BY 
+    m.MovieId;
+
+
+    `);
+
+    await connection.execute(`
+    CREATE OR REPLACE VIEW MovieOffers AS
+SELECT 
+    o.id AS offerId,
+    o.title AS offerTitle,
+    o.description AS offerDescription,
+    o.discount AS offerDiscount,
+    o.icon AS offerIcon
+FROM 
+    Offers AS o;
+    `);
+
     console.log("Tables created successfully!");
   } catch (error) {
     console.error("Error creating tables:", error);
-  } 
+  }
 };
 
 createTables();

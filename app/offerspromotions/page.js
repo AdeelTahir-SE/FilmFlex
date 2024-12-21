@@ -107,11 +107,11 @@ export default function OffersandPromotions() {
         ]);
         if (offersRes.ok) {
           const offersData = await offersRes.json();
-          setOffers(offersData);
+          setOffers(offersData.discount);
         }
         if (movieSalesRes.ok) {
           const movieSalesData = await movieSalesRes.json();
-          setMovieSales(movieSalesData);
+          setMovieSales(movieSalesData.moviesSale);
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -139,13 +139,13 @@ export default function OffersandPromotions() {
         <div className="flex flex-wrap justify-center border-b-2 border-slate-600 pb-24">
           {offers.map((offer) => (
             <div
-              key={offer.id}
+              key={offer.offerId}
               className="flex flex-col items-center justify-center p-6 bg-gray-900 rounded-lg shadow-lg m-4 w-80 border border-red-700 transform transition-transform hover:scale-105"
             >
-              {offer.icon}
-              <h2 className="text-2xl text-red-500 mb-2">{offer.title}</h2>
-              <p className="text-gray-300 mb-4">{offer.description}</p>
-              <span className="text-red-600 font-bold">{offer.discount}</span>
+              {offer.offerIcon}
+              <h2 className="text-2xl text-red-500 mb-2">{offer.offerTitle}</h2>
+              <p className="text-gray-300 mb-4">{offer.offerDescription}</p>
+              <span className="text-red-600 font-bold">{offer.offerDiscount}</span>
             </div>
           ))}
         </div>
@@ -158,17 +158,17 @@ export default function OffersandPromotions() {
           <div className="flex flex-wrap justify-center">
             {movieSales.map((movie) => (
               <div
-                key={movie.id}
+                key={movie.movieid}
                 className="flex flex-col items-center justify-center p-6 bg-gray-900 rounded-lg shadow-lg m-4 w-80 border border-red-700 transform transition-transform hover:scale-105"
               >
                 <Image
-                  src={movie.image}
-                  alt={movie.title}
+                  src={movie.movieImage}
+                  alt={movie.movieName}
                   width={90}
                   height={48}
                   className="w-full h-48 object-cover mb-4 rounded"
                 />
-                <h3 className="text-2xl text-red-500 mb-2">{movie.title}</h3>
+                <h3 className="text-2xl text-red-500 mb-2">{movie.movieName}</h3>
                 <p className="text-gray-300 mb-4">
                   <span className="line-through">{movie.originalPrice}</span>{" "}
                   <span className="text-red-600">{movie.salePrice}</span>
