@@ -37,7 +37,7 @@ LIMIT 3`
 
 export async function getMovieDetails(){
 const [rows]=await connection.execute(
-  "SELECT * FROM MovieDetails"
+  "SELECT * FROM week_movies_summary"
 );
 return rows;
 }
@@ -45,11 +45,15 @@ return rows;
 
 
 
-export async function getMovie(id) {
-  const [rows] = await connection.execute("SELECT * FROM MovieDetailsWithReviews WHERE movieId = ?", [
-    id,
-  ]);
-  return rows[0];
+export async function getMovie(id, day, timings) {
+  console.log(id, day, timings);
+  console.log("in databse");
+  const [rows] = await connection.execute(
+    "SELECT * FROM MovieDetailsWithTimings WHERE movieId = ? AND day = ? AND timings = ?",
+    [id, day, timings]
+  );
+  console.log(rows);
+  return rows[0];  // Return the first matching row
 }
 
 

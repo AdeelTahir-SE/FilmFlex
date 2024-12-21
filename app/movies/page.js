@@ -1,8 +1,9 @@
+"use client";
 import MovieSlider from "@/app/component/moviesslider";
 import DayMovies from "@/app/component/DayMovies"; // Updated import for DayMovies
 import img1 from "@/app/component/image.jpeg";
 import img2 from "@/app/component/image2.jpeg";
-import Seats from "@/app/component/Seats";
+import { useState, useEffect } from "react";
 
 // Default movie data to be used if fetching fails
 const defaultMovies = [
@@ -27,40 +28,77 @@ const defaultMovies = [
   // Add similar default data for other days...
 ];
 
-// Server-side fetch function
-async function fetchMovies() {
-  try {
-    const res = await fetch("/api/weekMovie"); // Replace with your API endpoint
-    if (!res.ok) {
-      throw new Error("Failed to fetch movies");
-    }
-    const data = await res.json();
-
-    // Group the movies by day of the week
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-    const groupedMovies = {};
-    days.forEach((day) => {
-      groupedMovies[day] = data.filter((movie) => movie.day === day);
-    });
-
-    return groupedMovies;
-  } catch (error) {
-    console.error(error);
-    // If fetch fails, return default data for all days
-    return {
-      Monday: defaultMovies,
-      Tuesday: defaultMovies,
-      Wednesday: defaultMovies,
-      Thursday: defaultMovies,
-      Friday: defaultMovies,
-    };
-  }
-}
-
 // React component
-export default async function Page() {
-  // Fetch data server-side
-  const movies = await fetchMovies();
+export default function Page() {
+  const [movies, setMovies] = useState({
+    Monday: defaultMovies,
+    Tuesday: defaultMovies,
+    Wednesday: defaultMovies,
+    Thursday: defaultMovies,
+    Friday: defaultMovies,
+    Saturday: defaultMovies,
+    Sunday: defaultMovies,
+  });
+
+  // Fetch movies from API or use default data if fetching fails
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const res = await fetch("/api/weekMovies"); // Replace with your API endpoint
+        if (!res.ok) {
+          throw new Error("Failed to fetch movies");
+        }
+        const data = await res.json();
+
+        // Group the movies by day of the week
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const groupedMovies = {
+          Monday: [],
+          Tuesday: [],
+          Wednesday: [],
+          Thursday: [],
+          Friday: [],
+          Saturday: [],
+          Sunday: [],
+        };
+
+        // Group movies by day
+        data.movies.forEach((movie) => {
+          if (groupedMovies[movie.day]) {
+            groupedMovies[movie.day].push({
+              movieId: movie.movieId,
+              title: movie.name,
+              timing: `${movie.timings.substring(0, 5)} ${movie.timings.substring(6)}`, // Format time to show AM/PM
+              description: movie.description,
+              duration: `${movie.duration} minutes`,
+              price: movie.price,
+              movieImage: movie.imageUrl,
+              day: movie.day,
+            });
+          }
+        });
+
+        setMovies(groupedMovies);
+      } catch (error) {
+        console.error(error);
+        // If fetch fails, return default data for all days
+        setMovies({
+          Monday: defaultMovies,
+          Tuesday: defaultMovies,
+          Wednesday: defaultMovies,
+          Thursday: defaultMovies,
+          Friday: defaultMovies,
+          Saturday: defaultMovies,
+          Sunday: defaultMovies,
+        });
+      }
+    };
+
+    fetchMovies(); // Call the async fetch function
+  }, []); // Empty dependency array ensures this runs once when the component mounts
+
+  // Combine all movies for the week and pass to MovieSlider
+  const allMovies = Object.values(movies).flat();
 
   return (
     <div className="flex flex-col bg-black h-full">
@@ -69,7 +107,8 @@ export default async function Page() {
       </h1>
       <div className="flex flex-col items-center justify-center">
         <h2 className="text-white font-bold text-2xl">Latest</h2>
-        <MovieSlider movies={movies.Monday} /> {/* Pass only Monday's movies here */}
+        {/* Pass all movies to the MovieSlider */}
+        <MovieSlider movies={allMovies} />
       </div>
 
       <div className="flex flex-col items-center justify-center bg-black text-white min-h-screen p-4">
@@ -91,8 +130,7 @@ export default async function Page() {
                 key={day}
                 className="bg-gray-950 p-6 rounded-lg shadow-glow border-b-4 border-red-600"
               >
-                <h2 className="text-2xl font-bold text-white">{day}</h2>
-                <DayMovies dayMovies={movies[day]} /> {/* Pass all movies for that day */}
+                <DayMovies dayMovies={movies[day]} /> Pass all movies for that day
               </div>
             ))}
           </div>

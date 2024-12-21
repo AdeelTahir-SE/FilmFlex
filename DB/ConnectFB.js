@@ -2,8 +2,10 @@ import { initializeApp } from 'firebase/app';
 import {
   initializeFirestore,
   doc,
+setDoc,
   updateDoc,
   collection,
+  where,
   onSnapshot,
   getDocs,
   query
@@ -29,41 +31,43 @@ const db = initializeFirestore(app, {
 });
 
 // Function to update seat status in Firestore
-export const updateSeatStatus = async (movieId, seatNumber, status, userId) => {
-  try {
-    const seatRef = doc(db, "movies", `${movieId}_seat_${seatNumber}`); // Document name includes movieId and seatNumber
+export const updateSeatStatus = async (movieId, seatNumber, status, userId, day, time) => {
+  if (userId == null) {
+    throw new Error("User not authenticated");
+  }
 
-    await updateDoc(seatRef, { seatType: status, userId }); // Update the seat status in Firestore
+  try {
+    // Reference to the seat document
+    const seatRef = doc(db, "movies", movieId.toString(), "days", day, "timings", time, "seats", `seat${seatNumber}`);
+
+    await updateDoc(seatRef, { seatType: status, userId }); // Update seat status and userId
     console.log(`Seat ${seatNumber} updated to ${status}`);
   } catch (error) {
     console.error("Error updating seat status: ", error);
     throw new Error(`Failed to update seat ${seatNumber} status to ${status}`);
   }
 };
-export const listenToSeatUpdates = (movieId, callback) => {
-  const seatRef = collection(db, "movies");
-  
-  // Real-time listener to capture changes for seats in the specified movie
+
+export const listenToSeatUpdates = (movieId, day, time, callback) => {
+  const seatRef = collection(db, "movies", movieId.toString(), "days", day, "timings", time, "seats");
+
   const unsubscribe = onSnapshot(seatRef, (snapshot) => {
-    const seatData = snapshot.docs
-      .filter(doc => doc.id.startsWith(`${movieId}_seat_`)) // Filter by movieId
-      .map(doc => doc.data());
-    
-    callback(seatData); // Pass updated seat data to the callback function
+    const seatData = snapshot.docs.map((doc) => {
+      return doc.data();
+    });
+    callback(seatData); 
   });
 
-  return unsubscribe; // Return unsubscribe function to stop listening
+  return unsubscribe; 
 };
 
-export const fetchSeatLayout = async (movieId) => {
+export const fetchSeatLayout = async (movieId, day, time) => {
   try {
-    const seatRef = collection(db, "movies");
-    const seatQuery = query(seatRef); // Query the movies collection
-    const querySnapshot = await getDocs(seatQuery);
-    
-    const seatData = querySnapshot.docs
-      .filter(doc => doc.id.startsWith(`${movieId}_seat_`)) // Filter by movieId
-      .map(doc => doc.data()); // Extract seat data from documents
+    const seatRef = collection(db, "movies", movieId.toString(), "days", day, "timings", time, "seats");
+    const seatQuery = query(seatRef); // Query the seats collection
+    const querySnapshot = await getDocs(seatQuery); // Fetch the documents in the collection
+
+    const seatData = querySnapshot.docs.map((doc) => doc.data());
 
     return seatData; // Return the seat layout
   } catch (error) {
@@ -72,37 +76,94 @@ export const fetchSeatLayout = async (movieId) => {
   }
 };
 
-
+// Function to get all movies reserved by a particular userId
 export const getMoviesByUserId = async (userId) => {
   try {
-    console.log("Fetching movies reserved by user:", userId);
-
-    const seatRef = collection(db, "movies");
-    const seatQuery = query(seatRef); // Query all documents in the movies collection
-    const querySnapshot = await getDocs(seatQuery);
-
-    console.log(`Found ${querySnapshot.docs.length} seats in Firestore`);
-
+    const moviesRef = collection(db, "movies");
     const userMovies = [];
 
-    // Iterate through each seat document
-    for (const doc of querySnapshot.docs) {
-      if (doc.id.startsWith("movie")) continue; // Skip movie documents (if present)
+    const querySnapshot = await getDocs(moviesRef);
 
-      const seatData = doc.data();
-      if (seatData.userId === userId && seatData.seatType === "reserved") {
-        console.log(`User ${userId} has reserved seat ${doc.id}`);
-        userMovies.push(seatData); // Add the seat data to the list
+    // Iterate through each movie document
+    for (const doc of querySnapshot.docs) {
+      const movieId = doc.id;
+      const movieData = doc.data(); // Get the movie data to access days and timings
+
+      const daysRef = collection(db, "movies", movieId, "days");
+      const daysSnapshot = await getDocs(daysRef);
+
+      // Iterate through each day and timings
+      for (const dayDoc of daysSnapshot.docs) {
+        const day = dayDoc.id;
+        const timingsRef = collection(db, "movies", movieId, "days", day, "timings");
+        const timingsSnapshot = await getDocs(timingsRef);
+
+        for (const timeDoc of timingsSnapshot.docs) {
+          const time = timeDoc.id;
+
+          const seatsRef = collection(db, "movies", movieId, "days", day, "timings", time, "seats");
+          const seatQuery = query(seatsRef, where("userId", "==", userId.toString()), where("seatType", "==", "reserved"));
+          const seatSnapshot = await getDocs(seatQuery);
+
+          if (!seatSnapshot.empty) {
+            seatSnapshot.forEach((seatDoc) => {
+              const seatId = seatDoc.id;
+              userMovies.push({ movieId, userId, seatId, day, time });
+            });
+          }
+        }
       }
     }
 
-    console.log("Movies reserved by user:", userMovies);
-    return userMovies;
+    return userMovies; // Return the list of movies with reserved seats for the user
   } catch (error) {
     console.error("Error fetching movies reserved by user:", error);
     throw new Error("Failed to fetch movies reserved by user");
   }
 };
+
+
+export const cancelSeatReservation = async (movieId, seatNumber, day, time) => {
+alert("Seat will be cancelled soon Thank you for your patience")  
+  try {
+    // Reference to the seat document
+    const seatRef = doc(db, "movies", movieId.toString(), "days", day, "timings", time, "seats", `seat${seatNumber}`);
+
+    // Update the seat status to "available" and remove userId (if any)
+    await updateDoc(seatRef, {
+      seatType: "available", // Change status to "available"
+      userId: null,          // Remove userId to indicate the seat is no longer reserved
+    });
+
+    console.log(`Seat ${seatNumber} has been updated to available`);
+  } catch (error) {
+    console.error("Error cancelling seat reservation: ", error);
+    throw new Error("Failed to cancel seat reservation");
+  }
+};
+
+export const generateDummySeatsForFirebase = async (movieId, day, timings, numSeats) => {
+  const seatTypes = ["premium", "reserved", "available"];
+  
+  // Loop through the number of seats and create dummy data
+  for (let i = 1; i <= numSeats; i++) {
+    const seatType = seatTypes[Math.floor(Math.random() * seatTypes.length)];
+
+    const seatRef = doc(db, "movies", movieId.toString(), "days", day, "timings", timings, "seats", `seat${i}`);
+
+    // Set the seat document with the seat type and other details
+    await setDoc(seatRef, {
+      seatNumber: i,
+      seatType: seatType,
+      timing: timings,
+      day: day,
+      userId: seatType === "reserved" ? "user123" : null, // Only add userId if the seat is reserved
+    });
+
+    console.log(`Dummy seat ${i} added with status ${seatType}`);
+  }
+};
+
 
 // Export necessary Firestore functions for use in components or pages
 export { db, collection, query, getDocs, doc, onSnapshot };

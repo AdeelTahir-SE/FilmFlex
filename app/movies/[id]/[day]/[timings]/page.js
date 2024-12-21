@@ -3,10 +3,12 @@ import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import MovieTrailer from "@/app/component/MoiveTrailer";
-import Seats from "@/app/component/Seats";
+import Seats from "@/app/component/Seats"; // Ensure this component handles day and time as props
 
 export default function Page() {
-  const { id } = useParams();
+  const { id, day, timings } = useParams(); // Extracting day and timings from params
+  let decodedTimings = decodeURIComponent(timings); // Decode timings to handle spaces correctly
+
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(0);
@@ -14,9 +16,9 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch movie data (API call)
-  const fetchMovieData = async (movieId) => {
+  const fetchMovieData = async (movieId, day, timings) => {
     try {
-      const response = await fetch(`/api/movie/${movieId}`);
+      const response = await fetch(`/api/movie/${movieId}/${day}/${timings}`);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Failed to fetch movie data");
       setMovieData(data.movie);
@@ -60,7 +62,7 @@ export default function Page() {
     e.preventDefault();
     if (newComment.trim() && newRating > 0) {
       const review = {
-        name: "Anonymous", // Set the name to "Anonymous"
+        name: "You", // Set the name to "You"
         comment: newComment,
         rating: newRating,
       };
@@ -74,10 +76,10 @@ export default function Page() {
 
   useEffect(() => {
     if (id) {
-      fetchMovieData(id);
+      fetchMovieData(id, day, decodedTimings); // Pass the decoded timings
       fetchMovieReviews(id);
     }
-  }, [id]);
+  }, [id, day, decodedTimings]); // Trigger re-fetch when id, day, or timings change
 
   if (isLoading) {
     return (
@@ -98,21 +100,21 @@ export default function Page() {
   return (
     <div className="p-6 bg-black text-white min-h-screen w-full">
       <h1 className="text-4xl font-bold mb-4 text-red-600 text-center">
-        {movieData.movieName}
+        {movieData.name}
       </h1>
       <div className="mb-6 w-full">
         <MovieTrailer
           trailerlink={
-            movieData.movieTrailer || "https://www.youtube.com/embed/pyKONWsQ1ek?si=Liz_WQBdBV0kkvAj"
+            movieData.trailer || "https://www.youtube.com/embed/pyKONWsQ1ek?si=Liz_WQBdBV0kkvAj"
           }
-          thumbnail={movieData.movieImage}
+          thumbnail={movieData.imageUrl}
           className="w-full h-auto"
         />
       </div>
       <div className="flex items-start mb-6">
         <div className="w-1/3 mr-4">
           <Image
-            src={movieData.movieImage}
+            src={movieData.imageUrl}
             alt="Movie Poster"
             width={200}
             height={300}
@@ -120,7 +122,7 @@ export default function Page() {
           />
         </div>
         <div className="flex-grow">
-          <p className="mt-4 text-gray-300">{movieData.movieDescription}</p>
+          <p className="mt-4 text-gray-300">{movieData.description}</p>
         </div>
       </div>
 
@@ -178,7 +180,8 @@ export default function Page() {
 
       <div className="mt-8">
         <h2 className="text-2xl font-bold text-red-500 text-center mb-4">Seat Layout</h2>
-        <Seats movieId={id}/>
+        {/* Pass day, time, and movieId to the Seats component */}
+        <Seats movieId={id} day={day} time={decodedTimings} />
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-"use client";
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -10,7 +9,7 @@ import {
 import { FaGem, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { updateSeatStatus, listenToSeatUpdates, fetchSeatLayout } from "@/DB/ConnectFB"; // Import the functions
 
-export default function Seats({ movieId }) {
+export default function Seats({ movieId, day, timings }) {
   const [premiumSeats, setPremiumSeats] = useState([]);
   const [reservedSeats, setReservedSeats] = useState([]);
   const [availableSeats, setAvailableSeats] = useState([]);
@@ -27,30 +26,13 @@ export default function Seats({ movieId }) {
     return userIdCookie ? userIdCookie.split("=")[1] : null;
   };
 
-
-  // Calculate seat layout dynamically
-  const calculateSeatLayout = (noofseats) => {
-    const cols = Math.ceil(Math.sqrt(noofseats)); // Use square root for a balanced layout
-    const rows = Math.ceil(noofseats / cols);
-    const containers = Math.ceil(rows / 3); // Divide rows into 3 containers
-
-    const seatsPerContainer = Math.floor(noofseats / containers);
-    const lastContainerSeats = noofseats - seatsPerContainer * (containers - 1);
-
-    return {
-      cols,
-      containers: Array.from({ length: containers }, (_, i) =>
-        i === containers - 1 ? lastContainerSeats : seatsPerContainer
-      ),
-    };
-  };
-
-  // Fetch seat data in real-time
   useEffect(() => {
-    // Listen for seat updates
+    // Get userId from cookie
     const userId = getUserIdFromCookie();
-    setUserId(userId); 
-    const unsubscribe = listenToSeatUpdates(movieId, (seatData) => {
+    setUserId(userId); // Store userId in state
+
+    // Listen for seat updates
+    const unsubscribe = listenToSeatUpdates(movieId, day, timings, (seatData) => {
       const premiumSeats = [];
       const reservedSeats = [];
       const normalSeats = [];
@@ -76,7 +58,7 @@ export default function Seats({ movieId }) {
     });
 
     // Fetch initial seat layout on component mount
-    fetchSeatLayout(movieId)
+    fetchSeatLayout(movieId, day, timings)
       .then((seatData) => {
         const totalSeats = seatData.length;
         const { cols, containers } = calculateSeatLayout(totalSeats);
@@ -85,7 +67,32 @@ export default function Seats({ movieId }) {
       .catch((error) => console.error(error));
 
     return () => unsubscribe(); // Cleanup listener on unmount
-  }, [movieId]);
+  }, [movieId, day, timings]);
+
+  // Calculate seat layout dynamically
+  const calculateSeatLayout = (noOfSeats) => {
+    const cols = 5; // Fixed number of columns
+    const containers = 3; // Fixed number of containers
+
+    // Calculate total rows required
+    const totalRows = Math.ceil(noOfSeats / cols);
+
+    // Distribute rows evenly among containers
+    const rowsPerContainer = Math.floor(totalRows / containers);
+    const extraRows = totalRows % containers;
+
+    // Calculate seats per container
+    const containersArray = Array.from({ length: containers }, (_, i) =>
+      i < extraRows
+        ? (rowsPerContainer + 1) * cols // Extra row for some containers
+        : rowsPerContainer * cols
+    );
+
+    return {
+      cols,
+      containers: containersArray,
+    };
+  };
 
   // Handle seat click
   const handleSeatClick = (seatNumber, type) => {
@@ -96,10 +103,8 @@ export default function Seats({ movieId }) {
 
   // Reserve seat
   const handleReserveSeat = async () => {
-    if (!selectedSeat) return;
-
     try {
-      await updateSeatStatus(movieId, selectedSeat, "reserved",userId); // Update the seat status to reserved
+      await updateSeatStatus(movieId, day, timings, selectedSeat, "reserved", userId); // Pass day, timings, and userId when updating the seat status
       setIsDialogOpen(false);
       alert(`Seat ${selectedSeat} reserved successfully!`);
     } catch (error) {
@@ -192,7 +197,7 @@ export default function Seats({ movieId }) {
               onClick={closeDialog}
               className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded mr-2"
             >
-              Close
+              
             </button>
             {dialogType === "available" && (
               <button

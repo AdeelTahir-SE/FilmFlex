@@ -1,5 +1,5 @@
 "use client";
-
+import { cancelSeatReservation } from "@/DB/ConnectFB";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,11 @@ export default function EnhancedProfile() {
   const [newPassword, setNewPassword] = useState("");
   const [newName, setNewName] = useState("");
   const [previewImage, setPreviewImage] = useState("");
-  const [loading, setLoading] = useState({ name: false, password: false, image: false });
+  const [loading, setLoading] = useState({
+    name: false,
+    password: false,
+    image: false,
+  });
   const [error, setError] = useState({ name: "", password: "", image: "" });
   const fileInputRef = useRef(null);
   const { toast } = useToast();
@@ -38,8 +42,8 @@ export default function EnhancedProfile() {
         const response = await fetch("/api/user");
         if (!response.ok) throw new Error("Failed to fetch user data");
         const res = await response.json();
-        const seatsreserved=await getMoviesByUserId(getUserIdFromCookie());
-        console.log(seatsreserved)
+        const seatsreserved = await getMoviesByUserId(getUserIdFromCookie());
+        console.log(seatsreserved);
         const data = res.user;
         setUserData({
           name: data.name,
@@ -80,7 +84,9 @@ export default function EnhancedProfile() {
 
       toast({
         title: "Success",
-        description: `${attribute.charAt(0).toUpperCase() + attribute.slice(1)} updated successfully.`,
+        description: `${
+          attribute.charAt(0).toUpperCase() + attribute.slice(1)
+        } updated successfully.`,
       });
 
       if (attribute === "name") setNewName(info);
@@ -106,16 +112,25 @@ export default function EnhancedProfile() {
       formData.append("profile_picture", file);
 
       try {
-        const response = await fetch("/api/profilepic", { method: "POST", body: formData });
+        const response = await fetch("/api/profilepic", {
+          method: "POST",
+          body: formData,
+        });
         const data = await response.json();
         if (response.ok) {
           setUserData((prev) => ({ ...prev, profilePicture: data.url }));
-          toast({ title: "Success", description: "Profile picture uploaded successfully." });
+          toast({
+            title: "Success",
+            description: "Profile picture uploaded successfully.",
+          });
         } else {
           throw new Error(data.error || "Unknown error");
         }
       } catch {
-        setError((prev) => ({ ...prev, image: "Failed to upload profile picture. Please try again." }));
+        setError((prev) => ({
+          ...prev,
+          image: "Failed to upload profile picture. Please try again.",
+        }));
       } finally {
         setLoading((prev) => ({ ...prev, image: false }));
       }
@@ -128,12 +143,20 @@ export default function EnhancedProfile() {
       <ShootingStars />
       <Card className="bg-black text-red-800 max-w-lg mx-auto absolute top-24 left-0 right-0 p-4">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-center">Profile</CardTitle>
+          <CardTitle className="text-3xl font-bold text-center">
+            Profile
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex flex-col items-center">
-            <Avatar className="w-32 h-32 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-              <AvatarImage src={previewImage || userData.profilePicture} alt="Profile" />
+            <Avatar
+              className="w-32 h-32 cursor-pointer"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <AvatarImage
+                src={previewImage || userData.profilePicture}
+                alt="Profile"
+              />
               <AvatarFallback>
                 <Camera className="w-8 h-8" />
               </AvatarFallback>
@@ -145,7 +168,9 @@ export default function EnhancedProfile() {
               onChange={handleImageChange}
               accept="image/*"
             />
-            {error.image && <p className="text-red-500 text-sm">{error.image}</p>}
+            {error.image && (
+              <p className="text-red-500 text-sm">{error.image}</p>
+            )}
           </div>
           <Button
             onClick={() => fileInputRef.current?.click()}
@@ -184,7 +209,9 @@ export default function EnhancedProfile() {
               placeholder="Change Password"
               disabled={loading.password}
             />
-            {error.password && <p className="text-red-500 text-sm">{error.password}</p>}
+            {error.password && (
+              <p className="text-red-500 text-sm">{error.password}</p>
+            )}
             <Button
               onClick={() => handleAttributeChange("password", newPassword)}
               className="w-full bg-red-800"
@@ -199,8 +226,21 @@ export default function EnhancedProfile() {
             {userData.reservedSeats.length > 0 ? (
               <ul className="list-disc pl-5">
                 {userData.reservedSeats.map((seat, index) => (
-                  <li key={index} className="mb-1">
-                    {seat}
+                  <li
+                    key={index}
+                    className="text-gray-300 *:hover:text-red-500"
+                  >
+                    User {seat.userId} reserved seat# {seat.seatId} for movie with id
+                    {seat.movieId} on {seat.day}
+                    at {seat.time}.
+                    <button
+                      onClick={() =>
+                        cancelSeatReservation(seat.movieId,(seat.seatId).split("seat")[1], seat.day, seat.time)
+                      }
+                      className="text-red-500 hover:underline "
+                    >
+                      Cancel Reservation
+                    </button>
                   </li>
                 ))}
               </ul>

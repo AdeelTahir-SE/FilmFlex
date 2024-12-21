@@ -51,7 +51,7 @@ const createTables = async () => {
             );
         `);
 
-    // MovieTimings table
+    // MovieTimings table (with unique constraint to prevent duplicate timings for the same movie and day)
     await connection.execute(`
             CREATE TABLE IF NOT EXISTS MovieTimings (
                 timingId INT AUTO_INCREMENT PRIMARY KEY,
@@ -59,6 +59,7 @@ const createTables = async () => {
                 duration INT NOT NULL,
                 timings TIME NOT NULL,
                 day ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
+                UNIQUE (movieId, day, timings),  -- Prevent duplicate timings for the same movie and day
                 FOREIGN KEY (movieId) REFERENCES Movie(movieId) ON DELETE CASCADE
             );
         `);
@@ -83,6 +84,7 @@ const createTables = async () => {
             );
         `);
 
+    // Reviews table
     await connection.execute(`
             CREATE TABLE IF NOT EXISTS Reviews (
                 reviewId INT AUTO_INCREMENT PRIMARY KEY,
@@ -96,22 +98,12 @@ const createTables = async () => {
             );
         `);
 
-    // SeatLayout table
-    await connection.execute(`
-            CREATE TABLE IF NOT EXISTS SeatLayout (
-                seatLayoutId INT AUTO_INCREMENT PRIMARY KEY,
-                type ENUM('Normal', 'Premium', 'Reserved') NOT NULL,
-                seatNo INT NOT NULL
-            );
-        `);
-
     // Reservation table
     await connection.execute(`
             CREATE TABLE IF NOT EXISTS Reservation (
                 reservationId INT AUTO_INCREMENT PRIMARY KEY,
                 userId INT NOT NULL,
                 movieId INT NOT NULL,
-                seatId INT NOT NULL,
                 FOREIGN KEY (userId) REFERENCES User(id) ON DELETE CASCADE,
                 FOREIGN KEY (movieId) REFERENCES Movie(movieId) ON DELETE CASCADE
             );
@@ -135,7 +127,6 @@ const createTables = async () => {
             CREATE TABLE IF NOT EXISTS Transactions (
                 transactionId INT AUTO_INCREMENT PRIMARY KEY,
                 movieId INT NOT NULL,
-                seatNo INT NOT NULL,
                 method ENUM('JazzCash', 'Easypaisa') NOT NULL,
                 FOREIGN KEY (movieId) REFERENCES Movie(movieId) ON DELETE CASCADE
             );
@@ -165,133 +156,158 @@ const createTables = async () => {
         `);
 
     await connection.execute(`
-          
-CREATE OR REPLACE VIEW TrendingMovies AS
+        CREATE OR REPLACE VIEW TrendingMovies AS
+        SELECT 
+            m.MovieId AS movieId,
+            m.name AS movieName,
+            m.description,
+            m.trailer,
+            m.movieRatings,
+            COUNT(r.reservationId) AS reservationCount, 
+            AVG(rev.rating) AS averageRating, 
+            GROUP_CONCAT(DISTINCT mg.genre) AS genres, 
+            ANY_VALUE(mi.imageUrl) AS movieImage
+        FROM 
+            Movie AS m
+        JOIN 
+            Reservation AS r ON m.MovieId = r.movieId
+        LEFT JOIN 
+            Reviews AS rev ON m.MovieId = rev.movieId
+        LEFT JOIN 
+            MovieGenres AS mg ON m.MovieId = mg.movieId
+        LEFT JOIN 
+            MovieImage AS mi ON m.MovieId = mi.movieId
+        GROUP BY 
+            m.MovieId
+        ORDER BY 
+            reservationCount DESC, averageRating DESC
+        LIMIT 7;
+    `);
+
+    await connection.execute(`
+        CREATE OR REPLACE VIEW UserReviews AS
+        SELECT 
+            u.id AS userId,
+            u.name AS userName,
+            u.profilePicUrl AS userAvatar, 
+            r.rating AS userRating,
+            r.desc AS userComment,
+            r.timestamp AS reviewDate
+        FROM 
+            Reviews r
+        JOIN 
+            User u ON r.userId = u.id
+        ORDER BY 
+            r.timestamp DESC LIMIT 3;
+    `);
+
+    await connection.execute(`
+        CREATE OR REPLACE VIEW MovieSales AS
+        SELECT 
+            m.MovieId AS movieId,
+            m.name AS movieName,
+            mp.price AS originalPrice,
+            dp.discountPercentage,
+            dp.discountDay,
+            dp.discountTime,
+            (mp.price - (mp.price * dp.discountPercentage / 100)) AS salePrice,
+            mi.imageUrl AS movieImage
+        FROM 
+            MoviePrices AS mp
+        JOIN 
+            DiscountPrices AS dp ON mp.movieId = dp.movieId
+        JOIN 
+            Movie AS m ON mp.movieId = m.MovieId
+        LEFT JOIN 
+            MovieImage AS mi ON m.MovieId = mi.movieId;
+    `);
+
+    await connection.execute(`
+        CREATE OR REPLACE VIEW MovieDetailsWithReviews AS
+        SELECT 
+            m.MovieId AS movieId,
+            m.name AS movieName,
+            m.description AS movieDescription,
+            m.trailer AS movieTrailer,
+            AVG(rev.rating) AS averageRating,
+            COUNT(rev.reviewId) AS totalReviews,
+            GROUP_CONCAT(DISTINCT rev.desc ORDER BY rev.timestamp DESC) AS latestReviews,
+            GROUP_CONCAT(DISTINCT rev.userId ORDER BY rev.timestamp DESC) AS reviewAuthors,
+            ANY_VALUE(mi.imageUrl) AS movieImage
+        FROM 
+            Movie AS m
+        LEFT JOIN 
+            Reviews AS rev ON m.MovieId = rev.movieId
+        LEFT JOIN 
+            MovieImage AS mi ON m.MovieId = mi.movieId
+        GROUP BY 
+            m.MovieId;
+    `);
+
+    await connection.execute(`
+        CREATE OR REPLACE VIEW MovieOffers AS
+        SELECT 
+            o.id AS offerId,
+            o.title AS offerTitle,
+            o.description AS offerDescription,
+            o.discount AS offerDiscount,
+            o.icon AS offerIcon
+        FROM 
+            Offers AS o;
+    `);
+
+await connection.execute(`
+ CREATE OR REPLACE VIEW MovieDetailsWithTimings AS
 SELECT 
-    m.MovieId AS movieId,
-    m.name AS movieName,
+    m.movieId,
+    m.name,
     m.description,
-    m.trailer,
-    m.movieRatings,
-    COUNT(r.reservationId) AS reservationCount, -- Count of reservations for the movie
-    AVG(rev.rating) AS averageRating, -- Average rating from reviews
-    GROUP_CONCAT(DISTINCT mg.genre) AS genres, -- Concatenate movie genres
-    ANY_VALUE(mi.imageUrl) AS movieImage -- Get any image URL for the movie
+    mi.imageUrl,
+    m.trailer, -- Assuming the trailer URL is stored in the Movie table
+    s.day,
+    s.timings,
+    r.reviewId,
+    r.desc AS reviewDescription,
+    r.rating AS reviewRating
 FROM 
-    Movie AS m
-JOIN 
-    Reservation AS r ON m.MovieId = r.movieId
+    Movie m
+INNER JOIN 
+    MovieTimings s ON m.movieId = s.movieId
+INNER JOIN 
+    Movieimage mi ON mi.movieId = m.movieId
 LEFT JOIN 
-    Reviews AS rev ON m.MovieId = rev.movieId
-LEFT JOIN 
-    MovieGenres AS mg ON m.MovieId = mg.movieId
-LEFT JOIN 
-    MovieImage AS mi ON m.MovieId = mi.movieId -- Join with MovieImage table to get the image URL
-GROUP BY 
-    m.MovieId
-ORDER BY 
-    reservationCount DESC, averageRating DESC
-LIMIT 7;
+    Reviews r ON m.movieId = r.movieId;
 
-        `);
+    `)
     await connection.execute(`
-       
-CREATE OR REPLACE VIEW UserReviews AS
-SELECT 
-    u.id AS userId,
-    u.name AS userName,
-    u.profilePicUrl AS userAvatar, 
-    r.rating AS userRating,
-    r.desc AS userComment,
-    r.timestamp AS reviewDate
-FROM 
-    Reviews r
-JOIN 
-    User u ON r.userId = u.id
-ORDER BY 
-    r.timestamp DESC LIMIT 3;
-
-
-        `);
-
-    await connection.execute(`
-            CREATE OR REPLACE VIEW MovieSales AS
-SELECT 
-    m.MovieId AS movieId,
-    m.name AS movieName,
-    mp.price AS originalPrice,
-    dp.discountPercentage,
-    dp.discountDay,
-    dp.discountTime,
-    (mp.price - (mp.price * dp.discountPercentage / 100)) AS salePrice,
-    mi.imageUrl AS movieImage -- Added Movie Image URL
-FROM 
-    MoviePrices AS mp
-JOIN 
-    DiscountPrices AS dp ON mp.movieId = dp.movieId
-JOIN 
-    Movie AS m ON mp.movieId = m.MovieId
-LEFT JOIN 
-    MovieImage AS mi ON m.MovieId = mi.movieId; -- Join with MovieImage table to get the image URL
-
-
-`);
-
-    await connection.execute(`
+        CREATE OR REPLACE VIEW week_movies_summary AS
+SELECT
+    m.movieId,
+    m.name,
+    m.description,
+    mt.duration,
+    mt.timings,
+    mt.day,
+    mp.price,
+    mi.imageUrl
+FROM
+    Movie m
+INNER JOIN 
+    MovieTimings mt ON m.movieId = mt.movieId
     
-CREATE OR REPLACE VIEW MovieDetailsWithReviews AS
-SELECT 
-    m.MovieId AS movieId,
-    m.name AS movieName,
-    m.description AS movieDescription,
-    m.trailer AS movieTrailer,
-    AVG(rev.rating) AS averageRating, -- Average rating from reviews
-    COUNT(rev.reviewId) AS totalReviews, -- Total number of reviews
-    GROUP_CONCAT(DISTINCT rev.desc ORDER BY rev.timestamp DESC) AS latestReviews, -- Concatenate reviews
-    GROUP_CONCAT(DISTINCT rev.userId ORDER BY rev.timestamp DESC) AS reviewAuthors, -- Concatenate reviewer names
-    ANY_VALUE(mi.imageUrl) AS movieImage -- Get any image URL for the movie
-FROM 
-    Movie AS m
-LEFT JOIN 
-    Reviews AS rev ON m.MovieId = rev.movieId -- Join with Reviews table to get reviews
-LEFT JOIN 
-    MovieImage AS mi ON m.MovieId = mi.movieId -- Join with MovieImage to get movie image
-GROUP BY 
-    m.MovieId;
-
-
-    `);
-
-    await connection.execute(`
-    CREATE OR REPLACE VIEW MovieOffers AS
-SELECT 
-    o.id AS offerId,
-    o.title AS offerTitle,
-    o.description AS offerDescription,
-    o.discount AS offerDiscount,
-    o.icon AS offerIcon
-FROM 
-    Offers AS o;
-    `);
-
-    await connection.execute(`
-    CREATE TABLE IF NOT EXISTS MovieSeatsLayout (
-    seatLayoutId INT AUTO_INCREMENT PRIMARY KEY,
-    seatType ENUM('Normal', 'Premium', 'Reserved') NOT NULL,
-    seatNo INT NOT NULL,
-    movieId INT NOT NULL,
-    userId INT DEFAULT NULL, -- NULL indicates the seat is unreserved
-    FOREIGN KEY (movieId) REFERENCES Movie(movieId) ON DELETE CASCADE,
-    FOREIGN KEY (userId) REFERENCES User(id) ON DELETE SET NULL
-);
-
+    INNER JOIN
+    MovieImage mi ON m.movieId = mi.movieId
+    INNER JOIN MoviePrices as mp ON mp.movieId=m.movieId 
+ORDER BY
+    FIELD(mt.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday');
         `)
 
     console.log("Tables created successfully!");
-  } catch (error) {
-    console.error("Error creating tables:", error);
-  }
+  } catch (err) {
+    console.log("Error creating tables:", err);
+  } 
 };
 
 createTables();
+
 export default connection;

@@ -9,9 +9,10 @@ export async function GET(request){
             { status: 401 }
         );
     }
-    const discount=await getMovieDetails();
+    const movies=await getMovieDetails();
+    console.log(movies)
     return NextResponse.json(
-        { message: "Movies Discount",discount: discount },
+        { message: "Movies Weekly",movies: movies },
         { status: 200 }
     );
 }
