@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import MovieTrailer from "@/app/component/MoiveTrailer"; // Fixed import name
+import MovieTrailer from "@/app/component/MoiveTrailer";
 import Seats from "@/app/component/Seats";
 
 export default function Page() {
@@ -11,17 +11,14 @@ export default function Page() {
   const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(0);
   const [movieData, setMovieData] = useState(null);
-  const [seatLayout, setSeatLayout] = useState(null); // New state for seat layout
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch movie data
+  // Fetch movie data (API call)
   const fetchMovieData = async (movieId) => {
     try {
       const response = await fetch(`/api/movie/${movieId}`);
       const data = await response.json();
-
-      if (!response.ok)
-        throw new Error(data.error || "Failed to fetch movie data");
+      if (!response.ok) throw new Error(data.error || "Failed to fetch movie data");
       setMovieData(data.movie);
     } catch (error) {
       console.error(error.message);
@@ -30,37 +27,19 @@ export default function Page() {
     }
   };
 
-  // Fetch movie reviews
+  // Fetch movie reviews (API call)
   const fetchMovieReviews = async (movieId) => {
     try {
       const response = await fetch(`/api/movie/${movieId}/reviews`);
       const data = await response.json();
-
-      if (!response.ok)
-        throw new Error(data.error || "Failed to fetch movie reviews");
-
+      if (!response.ok) throw new Error(data.error || "Failed to fetch movie reviews");
       setComments(data.reviews);
     } catch (error) {
       console.error(error.message);
     }
   };
 
-  // Fetch seat layout
-  const fetchSeatLayout = async (movieId) => {
-    try {
-      const response = await fetch(`/api/movie/${movieId}/seats`);
-      const data = await response.json();
-
-      if (!response.ok)
-        throw new Error(data.error || "Failed to fetch seat layout");
-
-      setSeatLayout(data.seatLayout); // Assuming the API provides a seat layout object
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
-
-  // Add a new review
+  // Add a new review (API call)
   const addMovieReview = async (movieId, review) => {
     try {
       const response = await fetch(`/api/movie/${movieId}/reviews`, {
@@ -68,12 +47,8 @@ export default function Page() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(review),
       });
-
       const data = await response.json();
-
-      if (!response.ok)
-        throw new Error(data.error || "Failed to add movie review");
-
+      if (!response.ok) throw new Error(data.error || "Failed to add movie review");
       setComments((prev) => [review, ...prev]);
     } catch (error) {
       console.error(error.message);
@@ -85,13 +60,13 @@ export default function Page() {
     e.preventDefault();
     if (newComment.trim() && newRating > 0) {
       const review = {
-        name: "Anonymous",  // Set the name to "Anonymous"
+        name: "Anonymous", // Set the name to "Anonymous"
         comment: newComment,
         rating: newRating,
       };
-      addMovieReview(id, review);
-      setNewComment("");
-      setNewRating(0);
+      addMovieReview(id, review); // Add the review
+      setNewComment(""); // Reset comment input
+      setNewRating(0); // Reset rating input
     } else {
       alert("Please enter a valid comment and rating.");
     }
@@ -101,7 +76,6 @@ export default function Page() {
     if (id) {
       fetchMovieData(id);
       fetchMovieReviews(id);
-      fetchSeatLayout(id); // Fetch the seat layout for the movie
     }
   }, [id]);
 
@@ -129,8 +103,7 @@ export default function Page() {
       <div className="mb-6 w-full">
         <MovieTrailer
           trailerlink={
-            movieData.movieTrailer ||
-            "https://www.youtube.com/embed/pyKONWsQ1ek?si=Liz_WQBdBV0kkvAj"
+            movieData.movieTrailer || "https://www.youtube.com/embed/pyKONWsQ1ek?si=Liz_WQBdBV0kkvAj"
           }
           thumbnail={movieData.movieImage}
           className="w-full h-auto"
@@ -141,8 +114,8 @@ export default function Page() {
           <Image
             src={movieData.movieImage}
             alt="Movie Poster"
-            width={200} // Provide explicit width
-            height={300} // Provide explicit height
+            width={200}
+            height={300}
             className="rounded-lg hover:scale-105 transition-transform duration-300"
           />
         </div>
@@ -172,9 +145,7 @@ export default function Page() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-red-500 text-center mb-4">
-          Add a Review
-        </h2>
+        <h2 className="text-2xl font-bold text-red-500 text-center mb-4">Add a Review</h2>
         <form onSubmit={handleCommentSubmit} className="space-y-4">
           <div>
             <label className="block text-gray-300">Your Comment</label>
@@ -190,9 +161,7 @@ export default function Page() {
             <input
               type="number"
               value={newRating}
-              onChange={(e) =>
-                setNewRating(Math.min(5, Math.max(1, e.target.value)))
-              }
+              onChange={(e) => setNewRating(Math.min(5, Math.max(1, e.target.value)))}
               className="w-full p-2 bg-gray-700 text-gray-300 rounded"
               min="1"
               max="5"
@@ -207,16 +176,9 @@ export default function Page() {
         </form>
       </div>
 
-      {/* Seat Layout Section */}
       <div className="mt-8">
-        <h2 className="text-2xl font-bold text-red-500 text-center mb-4">
-          Seat Layout
-        </h2>
-        {seatLayout ? (
-          <Seats layout={seatLayout} /> // Render the seat layout
-        ) : (
-          <p className="text-gray-300 text-center">No seat layout available.</p>
-        )}
+        <h2 className="text-2xl font-bold text-red-500 text-center mb-4">Seat Layout</h2>
+        <Seats movieId={id}/>
       </div>
     </div>
   );

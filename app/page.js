@@ -140,7 +140,6 @@ export default function Home() {
                 </h3>
                 <p className="text-gray-300 mb-4">{movie.genres}</p>
                 <p className="text-gray-300 mb-4">Rating: {movie.movieRatings}</p>
-                <p className="text-gray-300 mb-4">Reservations: {movie.reservationCount}</p>
                 <p className="text-gray-300 mb-4">Average Rating: {movie.averageRating}</p>
                 <Link href={`/movies/${movie.movieId}`}>
                   <span className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">

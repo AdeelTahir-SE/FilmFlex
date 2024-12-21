@@ -37,7 +37,6 @@ const createTables = async () => {
                 name VARCHAR(255) NOT NULL,
                 description TEXT NOT NULL,
                 trailer VARCHAR(255),
-                seatLayoutId INT NOT NULL,
                 movieRatings DECIMAL(3, 2)
             );
         `);
@@ -274,6 +273,19 @@ SELECT
 FROM 
     Offers AS o;
     `);
+
+    await connection.execute(`
+    CREATE TABLE IF NOT EXISTS MovieSeatsLayout (
+    seatLayoutId INT AUTO_INCREMENT PRIMARY KEY,
+    seatType ENUM('Normal', 'Premium', 'Reserved') NOT NULL,
+    seatNo INT NOT NULL,
+    movieId INT NOT NULL,
+    userId INT DEFAULT NULL, -- NULL indicates the seat is unreserved
+    FOREIGN KEY (movieId) REFERENCES Movie(movieId) ON DELETE CASCADE,
+    FOREIGN KEY (userId) REFERENCES User(id) ON DELETE SET NULL
+);
+
+        `)
 
     console.log("Tables created successfully!");
   } catch (error) {

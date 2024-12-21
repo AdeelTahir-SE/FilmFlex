@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ShootingStars } from "@/components/ui/shooting-stars";
 import { StarsBackground } from "@/components/ui/stars-background";
 import { Camera } from "lucide-react";
-
+import { getMoviesByUserId } from "@/DB/ConnectFB";
 export default function EnhancedProfile() {
   const [userData, setUserData] = useState({
     name: "",
@@ -25,6 +25,12 @@ export default function EnhancedProfile() {
   const [error, setError] = useState({ name: "", password: "", image: "" });
   const fileInputRef = useRef(null);
   const { toast } = useToast();
+  // Function to get userId from cookie
+  const getUserIdFromCookie = () => {
+    const cookies = document.cookie.split("; ");
+    const userIdCookie = cookies.find((cookie) => cookie.startsWith("userid="));
+    return userIdCookie ? userIdCookie.split("=")[1] : null;
+  };
 
   useEffect(() => {
     async function fetchUserData() {
@@ -32,12 +38,14 @@ export default function EnhancedProfile() {
         const response = await fetch("/api/user");
         if (!response.ok) throw new Error("Failed to fetch user data");
         const res = await response.json();
+        const seatsreserved=await getMoviesByUserId(getUserIdFromCookie());
+        console.log(seatsreserved)
         const data = res.user;
         setUserData({
           name: data.name,
           email: data.email,
           profilePicture: data.profilePicUrl || "",
-          reservedSeats: data.reservedSeats || [],
+          reservedSeats: seatsreserved || [],
         });
         setNewName(data.name);
         setPreviewImage(data.profilePicUrl || "");

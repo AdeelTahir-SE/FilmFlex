@@ -13,13 +13,15 @@ export async function POST(request) {
       { status: 200 }
     );
 
-console.log(userId);
-    response.cookies.set("userid", userId, {
-      httpOnly: true, // Add more cookie options like secure, path, etc.
-      sameSite: "strict", // Adjust as per your requirements
-      maxAge: 60 * 60,  // Set the cookie expiry time to 1 hour (60 seconds * 60 minutes)
+response.cookies.set("userid", userId, {
+  // Remove httpOnly to allow client-side access
+  httpOnly: false,  // This makes the cookie accessible on the client-side
+  secure: process.env.NODE_ENV === "production", // Ensure the cookie is only sent over HTTPS in production
+  sameSite: "strict", // CSRF protection
+  maxAge: 60 * 60 * 1000, // Expiry time of 1 hour in milliseconds
+  path: "/", // Cookie available for the entire domain
+});
 
-    });
 
 if(userId)
     return response;
