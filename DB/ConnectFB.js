@@ -13,13 +13,13 @@ setDoc,
 
 // Firebase configuration object
 const firebaseConfig = {
-  apiKey: "AIzaSyApFy1QjNcCnRcNyUDaBy2njKbo1vUoiNU",
-  authDomain: "filmflex-c6591.firebaseapp.com",
-  projectId: "filmflex-c6591",
-  storageBucket: "filmflex-c6591.firebasestorage.app",
-  messagingSenderId: "346166409488",
-  appId: "1:346166409488:web:a37e7a61c9ff3bc202cd95",
-  measurementId: "G-F4PCJD2KMF"
+  apiKey: process.env.FB_API_KEY,
+  authDomain: process.env.FB_AUTH_DOMAIN,
+  projectId: FB_PROJECT_ID,
+  storageBucket: process.env.FB_STORAGE_BUCKET,
+  messagingSenderId: process.env.FB_SENDER_ID,
+  appId: process.env.FB_APP_ID,
+  measurementId: process.env.FB_MEASUREMENT_ID
 };
 
 // Initialize Firebase app
