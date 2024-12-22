@@ -16,9 +16,9 @@ export default function DayMovies({ dayMovies }) {
   }, [dayMovies]);
 
   return (
-    <div className="py-8 px-4 flex flex-col items-center justify-center">
+    <div className="py-8 px-4 flex flex-col items-center justify-center ">
       {/* Day List */}
-      <div className="space-y-6 w-full">
+      <div className="space-y-6 w-full border-b-2 border-red-600">
         <div className="bg-gray-950 p-6 rounded-lg shadow-lg border-b-4 border-red-600">
           {/* Render Movies for the Day */}
           <div className="flex justify-center gap-6">

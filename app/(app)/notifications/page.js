@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import NotificationCard from "../component/NotificationCard";
+import NotificationCard from "../../component/NotificationCard";
 
 export default function page() {
   const [Notifications, setNotifications] = useState([]);

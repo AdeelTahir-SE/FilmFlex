@@ -1,10 +1,10 @@
 "use client";
 import Image from "next/image";
 import { FaStar } from "react-icons/fa";
-import WhyJoin from "./component/WhyJoin";
+import WhyJoin from "../component/WhyJoin";
 import Link from "next/link";
 import useInViewAnimation from "@/app/component/useInView";
-import { Spotlight } from "./component/ui/Spotlight";
+import { Spotlight } from "../component/ui/Spotlight";
 import { useEffect, useState } from "react";
 
 function Customers({ comment, name, avatar, rating, date }) {

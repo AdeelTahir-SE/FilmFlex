@@ -1,44 +1,34 @@
 "use client";
 import MovieSlider from "@/app/component/moviesslider";
 import DayMovies from "@/app/component/DayMovies"; // Updated import for DayMovies
-import img1 from "@/app/component/image.jpeg";
-import img2 from "@/app/component/image2.jpeg";
 import { useState, useEffect } from "react";
 
-// Default movie data to be used if fetching fails
-const defaultMovies = [
-  {
-    title: "Default Movie 1",
-    timing: "Monday 7:00 PM",
-    description: "An exciting adventure movie.",
-    duration: "120 minutes",
-    price: "15.00",
-    movieImage: img1,
-    day: "Monday",
-  },
-  {
-    title: "Default Movie 2",
-    timing: "Monday 8:00 PM",
-    description: "A thrilling mystery movie.",
-    duration: "130 minutes",
-    price: "12.00",
-    movieImage: img2,
-    day: "Monday",
-  },
-  // Add similar default data for other days...
-];
+// // Default movie data to be used if fetching fails
+// const defaultMovies = [
+//   {
+//     title: "Default Movie 1",
+//     timing: "Monday 7:00 PM",
+//     description: "An exciting adventure movie.",
+//     duration: "120 minutes",
+//     price: "15.00",
+//     movieImage: img1,
+//     day: "Monday",
+//   },
+//   {
+//     title: "Default Movie 2",
+//     timing: "Monday 8:00 PM",
+//     description: "A thrilling mystery movie.",
+//     duration: "130 minutes",
+//     price: "12.00",
+//     movieImage: img2,
+//     day: "Monday",
+//   },
+//   // Add similar default data for other days...
+// ];
 
 // React component
 export default function Page() {
-  const [movies, setMovies] = useState({
-    Monday: defaultMovies,
-    Tuesday: defaultMovies,
-    Wednesday: defaultMovies,
-    Thursday: defaultMovies,
-    Friday: defaultMovies,
-    Saturday: defaultMovies,
-    Sunday: defaultMovies,
-  });
+  const [movies, setMovies] = useState({});
 
   // Fetch movies from API or use default data if fetching fails
   useEffect(() => {
@@ -82,15 +72,7 @@ export default function Page() {
       } catch (error) {
         console.error(error);
         // If fetch fails, return default data for all days
-        setMovies({
-          Monday: defaultMovies,
-          Tuesday: defaultMovies,
-          Wednesday: defaultMovies,
-          Thursday: defaultMovies,
-          Friday: defaultMovies,
-          Saturday: defaultMovies,
-          Sunday: defaultMovies,
-        });
+        setMovies();
       }
     };
 
@@ -130,7 +112,11 @@ export default function Page() {
                 key={day}
                 className="bg-gray-950 p-6 rounded-lg shadow-glow border-b-4 border-red-600"
               >
-                <DayMovies dayMovies={movies[day]} /> Pass all movies for that day
+                              <h1 className="
+                              text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-600 transition-transform transform hover:scale-105
+                              ">{day}</h1>
+
+                <DayMovies dayMovies={movies[day]} /> 
               </div>
             ))}
           </div>
