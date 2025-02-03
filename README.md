@@ -6,7 +6,6 @@ FilmFlex is a modern movie reservation platform designed to provide users with a
 - ✅ **Movie Listings** – Browse available movies and showtimes  
 - ✅ **Real-Time Seat Availability** – See available seats in real time  
 - ✅ **Booking & Reservations** – Reserve seats for movies quickly and easily  
-- ✅ **Secure Payment Integration** – Safe transactions using **Stripe**  
 - ✅ **Discounts & Offers** – Access exclusive movie discounts and promotions  
 - ✅ **Image Upload** – Movie posters and images stored on **Cloudinary**  
 
@@ -16,7 +15,6 @@ FilmFlex is a modern movie reservation platform designed to provide users with a
 - **Database:** MySQL  
 - **Real-Time Updates:** Firebase  
 - **Image Hosting:** Cloudinary  
-- **Payment:** Stripe  
 
 FilmFlex offers a **fast, secure, and enjoyable** movie booking experience. 🚀
 
